@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Viyan Personal Dashboard
 
-## Getting Started
+Self-hosted personal dashboard built with Next.js App Router, Prisma, PostgreSQL, NextAuth (Google OAuth), and Nginx.
 
-First, run the development server:
+## Features
+
+- OAuth login with Google and protected app routes
+- Drag-and-drop dashboard layout persisted per user
+- Google Calendar and Google Tasks widgets
+- Notes module with rich text editor (TipTap)
+- Finance tracker with KPIs, charts, budgets, and CSV import
+- Bookmarks manager grouped by category
+- Settings for theme, currency, timezone, and data reset
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- TypeScript
+- Prisma 7
+- PostgreSQL
+- NextAuth v5 beta
+- Tailwind CSS + shadcn/ui
+- Nginx reverse proxy (Docker)
+
+## Local Development
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy env file and set values:
+
+```bash
+copy .env.example .env
+```
+
+3. Generate Prisma client and apply migrations:
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Docker Deployment
 
-## Learn More
+Build and run the full stack (app, postgres, redis, nginx):
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker compose up --build -d
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+View logs:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker compose logs -f app
+```
 
-## Deploy on Vercel
+Stop services:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+docker compose down
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+- `npm run dev`: run development server
+- `npm run build`: production build
+- `npm run start`: start production server
+- `npm run lint`: run ESLint
+- `npm run prisma:generate`: generate Prisma client
+- `npm run prisma:migrate`: apply Prisma migrations
+
+## Production Notes
+
+- Configure strong secrets for `NEXTAUTH_SECRET` and encryption keys.
+- Ensure Google OAuth redirect URI matches deployment domain.
+- Run behind Nginx (included in `nginx/nginx.conf`) for proxying and cache headers.
+- Use persistent PostgreSQL volumes and regular backups.
