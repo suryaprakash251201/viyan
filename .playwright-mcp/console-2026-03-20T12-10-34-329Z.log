@@ -1,0 +1,28 @@
+[    1151ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at rX (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:47213)
+    at iu (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:98254)
+    at sd (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:138944)
+    at https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:133830
+    at se (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:133931)
+    at s$ (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:160495)
+    at MessagePort.O (https://viyan.suryaprakashinfo.in/_next/static/chunks/0vkgb7xyv-nko.js:1:8660)
+[    1551ms] [ERROR] n: Failed to fetch. Read more at https://errors.authjs.dev#autherror
+    at i (https://viyan.suryaprakashinfo.in/_next/static/chunks/029qdv-a.lfyc.js:1:35548)
+    at async v (https://viyan.suryaprakashinfo.in/_next/static/chunks/029qdv-a.lfyc.js:1:36760)
+    at async Object._getSession (https://viyan.suryaprakashinfo.in/_next/static/chunks/029qdv-a.lfyc.js:2:1656) @ https://viyan.suryaprakashinfo.in/_next/static/chunks/029qdv-a.lfyc.js:0
+[    1736ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://viyan.suryaprakashinfo.in/_next/static/chunks/0xhe_0c3o8ffg.js:0
+[    1737ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://viyan.suryaprakashinfo.in/_next/static/chunks/0xhe_0c3o8ffg.js:0
+[    1745ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://viyan.suryaprakashinfo.in/_next/static/chunks/0xhe_0c3o8ffg.js:0
+[    1745ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://viyan.suryaprakashinfo.in/_next/static/chunks/0xhe_0c3o8ffg.js:0
