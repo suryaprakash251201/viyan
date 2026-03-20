@@ -12,13 +12,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Upload, Plus, Loader2, Trash2 } from "lucide-react";
+import { Upload, Plus, Trash2, TrendingDown, TrendingUp, Wallet, Percent } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton, TableRowSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type TransactionType = "INCOME" | "EXPENSE";
 type TransactionCategory =
@@ -328,35 +331,52 @@ export function FinanceTracker() {
         />
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Total Income</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xl font-semibold text-emerald-600">
-            {formatINR(kpis.totalIncome)}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Total Expenses</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xl font-semibold text-rose-600">
-            {formatINR(kpis.totalExpenses)}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Savings</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xl font-semibold">{formatINR(kpis.savings)}</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Savings Rate</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xl font-semibold">{kpis.savingsRate.toFixed(1)}%</CardContent>
-        </Card>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="status" aria-busy={loading}>
+        {loading ? (
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-7 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Total Income</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold text-emerald-600">
+                {formatINR(kpis.totalIncome)}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Total Expenses</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold text-rose-600">
+                {formatINR(kpis.totalExpenses)}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Savings</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold">{formatINR(kpis.savings)}</CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Savings Rate</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xl font-semibold">{kpis.savingsRate.toFixed(1)}%</CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -409,29 +429,30 @@ export function FinanceTracker() {
                 onChange={(event) => setAmount(event.target.value)}
                 placeholder="Amount"
               />
-              <select
-                className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-                value={type}
-                onChange={(event) => setType(event.target.value as TransactionType)}
-              >
-                <option value="INCOME">Income</option>
-                <option value="EXPENSE">Expense</option>
-              </select>
-              <select
-                className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-                value={category}
-                onChange={(event) => setCategory(event.target.value as TransactionCategory)}
-              >
-                {CATEGORY_OPTIONS.map((entry) => (
-                  <option key={entry.value} value={entry.value}>
-                    {entry.label}
-                  </option>
-                ))}
-              </select>
+              <Select value={type} onValueChange={(value) => setType(value as TransactionType)}>
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INCOME">Income</SelectItem>
+                  <SelectItem value="EXPENSE">Expense</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={category} onValueChange={(value) => setCategory(value as TransactionCategory)}>
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((entry) => (
+                    <SelectItem key={entry.value} value={entry.value}>
+                      {entry.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
               <Input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Note" />
-              <Button type="button" onClick={onAddTransaction} disabled={savingTransaction}>
-                {savingTransaction ? <Loader2 className="animate-spin" /> : <Plus className="h-4 w-4" />}
+              <Button type="button" onClick={onAddTransaction} loading={savingTransaction}>
                 Add
               </Button>
             </div>
@@ -467,22 +488,25 @@ export function FinanceTracker() {
                           type="button"
                           size="icon-xs"
                           variant="ghost"
-                          disabled={deletingId === transaction.id}
+                          loading={deletingId === transaction.id}
                           onClick={() => void onDeleteTransaction(transaction.id)}
-                        >
-                          {deletingId === transaction.id ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </Button>
+                          aria-label="Delete transaction"
+                        />
                       </td>
                     </tr>
                   ))}
-                  {!loading && transactions.length === 0 ? (
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRowSkeleton key={i} columns={6} />
+                    ))
+                  ) : transactions.length === 0 ? (
                     <tr>
-                      <td className="px-2 py-3 text-muted-foreground" colSpan={6}>
-                        No transactions in this month.
+                      <td colSpan={6} className="px-2 py-3">
+                        <EmptyState
+                          icon={TrendingDown}
+                          title="No transactions"
+                          description="Add your first transaction for this month."
+                        />
                       </td>
                     </tr>
                   ) : null}
@@ -498,17 +522,18 @@ export function FinanceTracker() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-              <select
-                className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-                value={budgetCategory}
-                onChange={(event) => setBudgetCategory(event.target.value as TransactionCategory)}
-              >
-                {CATEGORY_OPTIONS.map((entry) => (
-                  <option key={entry.value} value={entry.value}>
-                    {entry.label}
-                  </option>
-                ))}
-              </select>
+              <Select value={budgetCategory} onValueChange={(value) => setBudgetCategory(value as TransactionCategory)}>
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((entry) => (
+                    <SelectItem key={entry.value} value={entry.value}>
+                      {entry.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input
                 type="number"
                 min="0"
@@ -517,32 +542,42 @@ export function FinanceTracker() {
                 onChange={(event) => setBudgetLimit(event.target.value)}
                 placeholder="Limit"
               />
-              <Button type="button" onClick={onSetBudget} disabled={savingBudget}>
-                {savingBudget ? <Loader2 className="animate-spin" /> : null}
+              <Button type="button" onClick={onSetBudget} loading={savingBudget}>
                 Set
               </Button>
             </div>
 
             <div className="space-y-3">
-              {budgetProgressData.map((budget) => (
-                <Progress
-                  key={budget.id}
-                  value={Math.min(100, budget.percentage)}
-                  className="rounded-lg border border-border/60 p-2"
-                >
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <ProgressLabel>
-                      {CATEGORY_OPTIONS.find((entry) => entry.value === budget.category)?.label}
-                    </ProgressLabel>
-                    <span className="ml-auto text-sm text-muted-foreground tabular-nums">
-                      {formatINR(budget.spent)} / {formatINR(budget.limit)}
-                    </span>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="rounded-lg border border-border/60 p-2">
+                    <Skeleton className="h-6 w-full" />
                   </div>
-                </Progress>
-              ))}
-              {!loading && budgetProgressData.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No budgets set for this month.</p>
-              ) : null}
+                ))
+              ) : budgetProgressData.length === 0 ? (
+                <EmptyState
+                  icon={Wallet}
+                  title="No budgets"
+                  description="Set monthly budgets to track your spending."
+                />
+              ) : (
+                budgetProgressData.map((budget) => (
+                  <Progress
+                    key={budget.id}
+                    value={Math.min(100, budget.percentage)}
+                    className="rounded-lg border border-border/60 p-2"
+                  >
+                    <div className="flex w-full items-center justify-between gap-2">
+                      <ProgressLabel>
+                        {CATEGORY_OPTIONS.find((entry) => entry.value === budget.category)?.label}
+                      </ProgressLabel>
+                      <span className="ml-auto text-sm text-muted-foreground tabular-nums">
+                        {formatINR(budget.spent)} / {formatINR(budget.limit)}
+                      </span>
+                    </div>
+                  </Progress>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -561,8 +596,7 @@ export function FinanceTracker() {
             value={csvText}
             onChange={(event) => setCsvText(event.target.value)}
           />
-          <Button type="button" onClick={onImportCsv} disabled={importingCsv}>
-            {importingCsv ? <Loader2 className="animate-spin" /> : <Upload className="h-4 w-4" />}
+          <Button type="button" onClick={onImportCsv} loading={importingCsv}>
             Import CSV
           </Button>
         </CardContent>

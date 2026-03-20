@@ -15,12 +15,10 @@ import {
   Highlighter,
   Italic,
   List,
-  Loader2,
   Pin,
   PinOff,
   Plus,
   Search,
-  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,6 +26,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { NoteSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface NoteItem {
   id: string;
@@ -245,12 +245,10 @@ function NoteEditor({
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button type="button" variant="destructive" onClick={onDelete} disabled={deleting}>
-            {deleting ? <Loader2 className="animate-spin" /> : <Trash2 className="h-4 w-4" />}
+          <Button type="button" variant="destructive" onClick={onDelete} loading={deleting}>
             Delete
           </Button>
-          <Button type="button" onClick={onSave} disabled={saving}>
-            {saving ? <Loader2 className="animate-spin" /> : null}
+          <Button type="button" onClick={onSave} loading={saving}>
             Save
           </Button>
         </div>
@@ -356,22 +354,30 @@ export function NotesManager() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <Button type="button" onClick={onCreate} disabled={creating}>
-            {creating ? <Loader2 className="animate-spin" /> : <Plus className="h-4 w-4" />}
+          <Button type="button" onClick={onCreate} loading={creating}>
             New
           </Button>
         </div>
       </header>
 
-      {loading ? <p className="text-sm text-muted-foreground">Loading notes...</p> : null}
+      {loading ? (
+        <div className="columns-1 gap-4 md:columns-2 xl:columns-3" aria-busy="true" role="status">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="mb-4 break-inside-avoid">
+              <NoteSkeleton />
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {!loading && notes.length === 0 ? (
         <Card>
-          <CardHeader>
-            <CardTitle>No notes yet</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Create your first note to get started.</p>
+          <CardContent className="py-8">
+            <EmptyState
+              icon={Search}
+              title="No notes found"
+              description="Create your first note to get started."
+            />
           </CardContent>
         </Card>
       ) : null}

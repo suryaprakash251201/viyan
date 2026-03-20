@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { unauthorized, successResponse } from "@/lib/api-utils";
 
 function normalizeTags(tags: unknown): string[] {
   if (!Array.isArray(tags)) {
@@ -13,48 +14,53 @@ function normalizeTags(tags: unknown): string[] {
     .filter(Boolean);
 }
 
-function unauthorizedResponse() {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-}
-
 export async function GET(request: Request) {
   const session = await auth();
   const userId = session?.user?.id;
 
   if (!userId) {
-    return unauthorizedResponse();
+    return unauthorized();
   }
 
   const { searchParams } = new URL(request.url);
-  const query = searchParams.get("query")?.trim().toLowerCase() ?? "";
+  const query = searchParams.get("query")?.trim();
   const onlyPinned = searchParams.get("pinned") === "true";
+  const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+  const offset = parseInt(searchParams.get("offset") || "0");
 
-  const notes = await prisma.note.findMany({
-    where: {
-      userId,
-      ...(onlyPinned ? { pinned: true } : {}),
+  // Build where clause for database-level filtering
+  const where: Prisma.NoteWhereInput = {
+    userId,
+    ...(onlyPinned ? { pinned: true } : {}),
+    ...(query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" } },
+            { tags: { has: query } },
+          ],
+        }
+      : {}),
+  };
+
+  const [notes, total] = await Promise.all([
+    prisma.note.findMany({
+      where,
+      orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
+      take: limit,
+      skip: offset,
+    }),
+    prisma.note.count({ where }),
+  ]);
+
+  return successResponse({
+    notes,
+    pagination: {
+      total,
+      limit,
+      offset,
+      hasMore: notes.length === limit,
     },
-    orderBy: [
-      {
-        pinned: "desc",
-      },
-      {
-        updatedAt: "desc",
-      },
-    ],
   });
-
-  const filtered = query
-    ? notes.filter((note) => {
-        const titleMatch = note.title.toLowerCase().includes(query);
-        const tagsMatch = note.tags.some((tag) => tag.toLowerCase().includes(query));
-        const contentMatch = JSON.stringify(note.content).toLowerCase().includes(query);
-
-        return titleMatch || tagsMatch || contentMatch;
-      })
-    : notes;
-
-  return NextResponse.json({ notes: filtered });
 }
 
 export async function POST(request: Request) {
@@ -62,7 +68,7 @@ export async function POST(request: Request) {
   const userId = session?.user?.id;
 
   if (!userId) {
-    return unauthorizedResponse();
+    return unauthorized();
   }
 
   const payload = (await request.json().catch(() => null)) as
@@ -95,5 +101,5 @@ export async function POST(request: Request) {
     },
   });
 
-  return NextResponse.json({ note }, { status: 201 });
+  return successResponse({ note }, 201);
 }

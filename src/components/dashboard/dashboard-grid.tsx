@@ -39,6 +39,10 @@ import {
 } from "@/lib/dashboard-layout";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
 import { TasksWidget } from "@/components/dashboard/tasks-widget";
+import { NotesWidget } from "@/components/dashboard/notes-widget";
+import { FinanceWidget } from "@/components/dashboard/finance-widget";
+import { BookmarksWidget } from "@/components/dashboard/bookmarks-widget";
+import { ErrorBoundary } from "@/components/error-boundary";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
@@ -345,14 +349,20 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
           const widget = widgetById[id];
           if (!widget) return null;
 
-          return (
-            <div key={id} className="pb-1">
-              {id === "calendar" || id === "tasks" ? (
-                <WidgetCard widget={widget}>
-                  {id === "calendar" ? <CalendarWidget /> : <TasksWidget />}
-                </WidgetCard>
-              ) : (
-                <WidgetCard widget={widget}>
+          const renderWidget = () => {
+            switch (id) {
+              case "calendar":
+                return <CalendarWidget />;
+              case "tasks":
+                return <TasksWidget />;
+              case "notes":
+                return <NotesWidget />;
+              case "finance":
+                return <FinanceWidget />;
+              case "bookmarks":
+                return <BookmarksWidget />;
+              default:
+                return (
                   <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/80 bg-background/50 p-6 text-center min-h-32">
                     <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-border/80 bg-card shadow-sm ${widget.accent}`}>
                       <widget.icon className="h-6 w-6" />
@@ -375,8 +385,15 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
-                </WidgetCard>
-              )}
+                );
+            }
+          };
+
+          return (
+            <div key={id} className="pb-1">
+              <WidgetCard widget={widget}>
+                <ErrorBoundary>{renderWidget()}</ErrorBoundary>
+              </WidgetCard>
             </div>
           );
         })}

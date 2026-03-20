@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Plus, Trash2, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { BookmarkSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type BookmarkItem = {
   id: string;
@@ -71,8 +73,7 @@ function BookmarkEditor({
           <Input placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
         </div>
         <div className="flex justify-end">
-          <Button type="button" onClick={onSave} disabled={saving}>
-            {saving ? <Loader2 className="animate-spin" /> : null}
+          <Button type="button" onClick={onSave} loading={saving}>
             Save
           </Button>
         </div>
@@ -215,19 +216,37 @@ export function BookmarksManager() {
               <option key={entry} value={entry} />
             ))}
           </datalist>
-          <Button type="button" onClick={onCreate} disabled={creating} className="md:col-span-5">
-            {creating ? <Loader2 className="animate-spin" /> : <Plus className="h-4 w-4" />}
+          <Button type="button" onClick={onCreate} loading={creating} className="md:col-span-5">
             Add Bookmark
           </Button>
         </CardContent>
       </Card>
 
-      {loading ? <p className="text-sm text-muted-foreground">Loading bookmarks...</p> : null}
+      {loading ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" role="status" aria-busy="true">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <BookmarkSkeleton />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {Array.from({ length: 3 }).map((_, j) => (
+                  <BookmarkSkeleton key={j} />
+                ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : null}
 
       {!loading && grouped.length === 0 ? (
         <Card>
-          <CardContent className="pt-4 text-sm text-muted-foreground">
-            No bookmarks yet. Add your first quick link above.
+          <CardContent className="py-8">
+            <EmptyState
+              icon={Bookmark}
+              title="No bookmarks"
+              description="Add your first quick link above."
+            />
           </CardContent>
         </Card>
       ) : null}
@@ -279,16 +298,10 @@ export function BookmarksManager() {
                       type="button"
                       size="icon-xs"
                       variant="ghost"
-                      disabled={deletingId === bookmark.id}
+                      loading={deletingId === bookmark.id}
                       onClick={() => void onDelete(bookmark.id)}
                       aria-label="Delete bookmark"
-                    >
-                      {deletingId === bookmark.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                    />
                   </div>
                 </div>
               ))}
