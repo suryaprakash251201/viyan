@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { GOOGLE_OAUTH_SCOPE } from "@/lib/auth";
+import { GOOGLE_OAUTH_SCOPE } from "@/lib/constants";
 
 type ThemeMode = "dark" | "light";
 

@@ -3,10 +3,8 @@ import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@/lib/encryption";
+import { GOOGLE_OAUTH_SCOPE } from "@/lib/constants";
 import type { NextAuthConfig } from "next-auth";
-
-export const GOOGLE_OAUTH_SCOPE =
-  "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks";
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
