@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     : DEFAULT_DASHBOARD_LAYOUTS;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/45 pb-10">
+    <main className="min-h-screen pb-10">
       <DashboardGrid initialLayouts={initialLayouts} />
     </main>
   );

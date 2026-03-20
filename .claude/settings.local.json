@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:\\\\Users\\\\acer\\\\OneDrive - cytroksys\\\\Documents\\\\Projects\\\\Viyan\" && npx tsc --noEmit 2>&1 | head -60)",
+      "Bash(cd \"C:\\\\Users\\\\acer\\\\OneDrive - cytroksys\\\\Documents\\\\Projects\\\\Viyan\" && npx tsc --noEmit 2>&1 | head -30)",
+      "Bash(cd \"C:\\\\Users\\\\acer\\\\OneDrive - cytroksys\\\\Documents\\\\Projects\\\\Viyan\" && npx next build 2>&1 | tail -40)"
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
+import { TopNav } from "@/components/layout/top-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <TopNav />
             {children}
             <Toaster richColors position="bottom-right" />
           </ThemeProvider>
