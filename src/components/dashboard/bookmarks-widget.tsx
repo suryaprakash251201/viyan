@@ -49,6 +49,10 @@ export function BookmarksWidget() {
         icon={Bookmark}
         title="No bookmarks"
         description="Add your favorite links"
+        action={{
+          label: "Add Bookmark",
+          onClick: () => window.location.href = "/bookmarks",
+        }}
       />
     );
   }

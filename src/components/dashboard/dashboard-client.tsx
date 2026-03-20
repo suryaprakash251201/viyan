@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { TopNav } from "@/components/layout/top-nav";
+import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { DashboardGrid } from "@/components/dashboard/dashboard-grid";
 import type { DashboardLayouts } from "@/lib/dashboard-layout";
 
@@ -21,17 +23,29 @@ export function DashboardClient({ initialLayouts }: DashboardClientProps) {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
+      {/* Desktop Sidebar */}
       <AppSidebar
         visibleWidgets={visibleWidgets}
         onToggleWidget={handleToggleWidget}
       />
-      <main className="flex-1 min-h-screen">
-        <DashboardGrid
-          initialLayouts={initialLayouts}
-          visibleWidgets={visibleWidgets}
+      
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+        <TopNav 
+          mobileSidebar={
+            <MobileSidebar 
+              visibleWidgets={visibleWidgets} 
+              onToggleWidget={handleToggleWidget} 
+            />
+          }
         />
-      </main>
+        <main className="flex-1">
+          <DashboardGrid
+            initialLayouts={initialLayouts}
+            visibleWidgets={visibleWidgets}
+          />
+        </main>
+      </div>
     </div>
   );
 }

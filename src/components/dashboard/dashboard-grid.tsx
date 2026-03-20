@@ -160,10 +160,10 @@ function DashboardHero({
             </p>
           </div>
           <div className="space-y-1">
-            <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="text-balance text-2xl font-semibold tracking-tight md:text-4xl">
               {greeting}
             </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
+            <p className="max-w-2xl text-xs text-muted-foreground md:text-base">
               A responsive command center for your calendar, tasks, notes, finance,
               and quick links.
             </p>
@@ -174,24 +174,25 @@ function DashboardHero({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="rounded-full border border-border/60 bg-card/70 px-3 py-2 text-xs text-muted-foreground backdrop-blur-sm">
+        <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+          <div className="hidden sm:block rounded-full border border-border/60 bg-card/70 px-3 py-2 text-xs text-muted-foreground backdrop-blur-sm">
             Layout sync on
           </div>
           <button
             type="button"
             onClick={onResetLayout}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-card"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-card md:px-3"
           >
             <RefreshCw className="h-3 w-3" />
-            Reset layout
+            <span className="hidden xs:inline">Reset layout</span>
+            <span className="xs:hidden">Reset</span>
           </button>
           {Object.entries(themePresets).map(([key, { label }]) => (
             <button
               key={key}
               type="button"
               onClick={() => onPresetChange(key as ThemePreset)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              className={`rounded-full border px-2.5 py-1.5 text-xs font-medium transition md:px-3 ${
                 preset === key
                   ? "border-primary bg-primary/20 text-primary"
                   : "border-border/50 text-muted-foreground hover:bg-card"

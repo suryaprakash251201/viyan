@@ -48,6 +48,10 @@ export function NotesWidget() {
         icon={NotebookPen}
         title="No notes"
         description="Create your first note"
+        action={{
+          label: "Create Note",
+          onClick: () => window.location.href = "/notes",
+        }}
       />
     );
   }

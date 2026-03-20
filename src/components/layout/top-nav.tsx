@@ -34,7 +34,11 @@ const NAV_LINKS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-function TopNav() {
+interface TopNavProps {
+  mobileSidebar?: React.ReactNode;
+}
+
+function TopNav({ mobileSidebar }: TopNavProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
@@ -43,18 +47,20 @@ function TopNav() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
-        {/* Logo + Brand */}
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-2.5 group"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-md shadow-primary/25 transition-transform duration-200 group-hover:scale-105">
-            <Sparkles className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold tracking-tight">
-            Viyan
-          </span>
-        </Link>
+        <div className="flex items-center gap-3">
+          {mobileSidebar}
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2.5 group"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-md shadow-primary/25 transition-transform duration-200 group-hover:scale-105">
+              <Sparkles className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="text-lg font-bold tracking-tight">
+              Viyan
+            </span>
+          </Link>
+        </div>
 
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-1">
@@ -148,26 +154,28 @@ function TopNav() {
         </div>
       </div>
 
-      {/* Mobile Nav */}
-      <div className="flex md:hidden items-center justify-between px-4 pb-2 gap-1 overflow-x-auto">
-        {NAV_LINKS.map((link) => {
-          const Icon = link.icon;
-          const active = pathname === link.href || pathname.startsWith(link.href + "/");
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={buttonVariants({
-                variant: active ? "secondary" : "ghost",
-                size: "icon-xs",
-                className: active ? "bg-primary/10 text-primary" : "text-muted-foreground",
-              })}
-            >
-              <Icon className="h-4 w-4" />
-            </Link>
-          );
-        })}
-      </div>
+      {/* Mobile Nav - only show if no mobileSidebar (fallback) */}
+      {!mobileSidebar && (
+        <div className="flex md:hidden items-center justify-between px-4 pb-2 gap-1 overflow-x-auto">
+          {NAV_LINKS.map((link) => {
+            const Icon = link.icon;
+            const active = pathname === link.href || pathname.startsWith(link.href + "/");
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={buttonVariants({
+                  variant: active ? "secondary" : "ghost",
+                  size: "icon-xs",
+                  className: active ? "bg-primary/10 text-primary" : "text-muted-foreground",
+                })}
+              >
+                <Icon className="h-4 w-4" />
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 }

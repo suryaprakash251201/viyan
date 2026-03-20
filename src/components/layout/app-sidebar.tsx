@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,9 +51,10 @@ const WIDGET_MENU_ITEMS = [
 interface AppSidebarProps {
   visibleWidgets: string[];
   onToggleWidget: (id: string) => void;
+  isMobile?: boolean;
 }
 
-function AppSidebar({ visibleWidgets, onToggleWidget }: AppSidebarProps) {
+function AppSidebar({ visibleWidgets, onToggleWidget, isMobile = false }: AppSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
@@ -62,9 +64,11 @@ function AppSidebar({ visibleWidgets, onToggleWidget }: AppSidebarProps) {
 
   return (
     <aside
-      className={`sticky top-0 z-40 flex h-screen flex-col border-r border-border/60 bg-card/80 backdrop-blur-xl transition-all duration-300 ${
-        collapsed ? "w-16" : "w-56"
-      }`}
+      className={cn(
+        "z-40 flex flex-col border-r border-border/60 bg-card/80 backdrop-blur-xl transition-all duration-300",
+        isMobile ? "w-full h-full" : "sticky top-0 h-screen hidden md:flex",
+        !isMobile && (collapsed ? "w-16" : "w-56")
+      )}
     >
       {/* Logo */}
       <div className="flex h-14 items-center justify-between border-b border-border/60 px-3">
@@ -82,20 +86,22 @@ function AppSidebar({ visibleWidgets, onToggleWidget }: AppSidebarProps) {
             </div>
           </Link>
         )}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+        {!isMobile && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => setCollapsed(!collapsed)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Nav items */}

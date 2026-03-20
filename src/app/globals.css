@@ -121,7 +121,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-500 ease-in-out;
     background-image:
       radial-gradient(circle at 10% 20%, color-mix(in oklch, var(--chart-2) 14%, transparent) 0%, transparent 24%),
       radial-gradient(circle at 90% 12%, color-mix(in oklch, var(--chart-3) 16%, transparent) 0%, transparent 28%),
@@ -129,8 +129,13 @@
     background-attachment: fixed;
   }
   html {
-    @apply font-sans;
+    @apply font-sans transition-colors duration-500;
   }
+}
+
+/* Micro-animations */
+.dashboard-hero, .dashboard-widget, .bg-card, .bg-background {
+  transition: background-color 0.5s ease-in-out, border-color 0.5s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .note-editor .ProseMirror {

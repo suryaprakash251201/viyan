@@ -75,6 +75,10 @@ export function FinanceWidget() {
         icon={Wallet}
         title="No transactions"
         description="Add your first transaction"
+        action={{
+          label: "Log Transaction",
+          onClick: () => window.location.href = "/finance",
+        }}
       />
     );
   }
