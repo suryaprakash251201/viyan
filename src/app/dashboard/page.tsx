@@ -4,7 +4,7 @@ import {
   isValidDashboardLayouts,
 } from "@/lib/dashboard-layout";
 import { prisma } from "@/lib/prisma";
-import { DashboardGrid } from "@/components/dashboard/dashboard-grid";
+import { DashboardClient } from "@/components/dashboard/dashboard-client";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -28,8 +28,6 @@ export default async function DashboardPage() {
     : DEFAULT_DASHBOARD_LAYOUTS;
 
   return (
-    <main className="min-h-screen pb-10">
-      <DashboardGrid initialLayouts={initialLayouts} />
-    </main>
+    <DashboardClient initialLayouts={initialLayouts} />
   );
 }

@@ -44,6 +44,7 @@ import "react-resizable/css/styles.css";
 
 interface DashboardGridProps {
   initialLayouts: DashboardLayouts;
+  visibleWidgets?: string[];
 }
 
 interface WidgetMeta {
@@ -256,7 +257,7 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
   );
 }
 
-export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
+export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
   const [layouts, setLayouts] = useState<DashboardLayouts>(
@@ -270,6 +271,11 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
   const widgetById = useMemo(
     () => Object.fromEntries(WIDGETS.map((widget) => [widget.id, widget])),
     []
+  );
+
+  const activeWidgetIds = useMemo(
+    () => visibleWidgets ?? WIDGETS.map((w) => w.id),
+    [visibleWidgets]
   );
 
   useEffect(() => {
@@ -335,8 +341,9 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
           persistLayout(nextLayouts);
         }}
       >
-        {Object.keys(widgetById).map((id) => {
+        {activeWidgetIds.map((id) => {
           const widget = widgetById[id];
+          if (!widget) return null;
 
           return (
             <div key={id} className="pb-1">
