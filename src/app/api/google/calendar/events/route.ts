@@ -43,7 +43,7 @@ export async function GET() {
   const tokens = await getAuthContext();
 
   if (!tokens) {
-    return unauthorizedResponse();
+    return NextResponse.json({ events: [], needsReauth: true });
   }
 
   const now = new Date();
@@ -65,6 +65,10 @@ export async function GET() {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      return NextResponse.json({ events: [], needsReauth: true });
+    }
+
     const errorText = await response.text();
     return NextResponse.json(
       { error: "Failed to fetch events", detail: errorText },
@@ -82,6 +86,7 @@ export async function GET() {
       end: event.end,
       colorId: event.colorId,
     })),
+    needsReauth: false,
   });
 }
 

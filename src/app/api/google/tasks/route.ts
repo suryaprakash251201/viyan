@@ -70,7 +70,7 @@ export async function GET() {
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
-    return unauthorizedResponse();
+    return NextResponse.json({ taskLists: [], needsReauth: true });
   }
 
   const listsResult = await callGoogle<{ items?: GoogleTaskList[] }>(
@@ -79,6 +79,10 @@ export async function GET() {
   );
 
   if (!listsResult.ok) {
+    if (listsResult.status === 401 || listsResult.status === 403) {
+      return NextResponse.json({ taskLists: [], needsReauth: true });
+    }
+
     return NextResponse.json(
       { error: "Failed to fetch task lists", detail: listsResult.detail },
       { status: listsResult.status }
@@ -117,7 +121,7 @@ export async function GET() {
     })
   );
 
-  return NextResponse.json({ taskLists: grouped });
+  return NextResponse.json({ taskLists: grouped, needsReauth: false });
 }
 
 export async function POST(request: Request) {

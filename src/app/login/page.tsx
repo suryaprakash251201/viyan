@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +11,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+function getSafeCallbackUrl(value: string | null): string {
+  if (!value) {
+    return "/dashboard";
+  }
+
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return value;
+}
+
 export default function LoginPage() {
+  const [callbackUrl] = useState(() => {
+    if (typeof window === "undefined") {
+      return "/dashboard";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    return getSafeCallbackUrl(params.get("callbackUrl"));
+  });
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
       {/* Gradient background effects */}
@@ -39,7 +61,7 @@ export default function LoginPage() {
 
         <CardContent className="space-y-6">
           <Button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            onClick={() => signIn("google", { callbackUrl })}
             variant="outline"
             className="h-12 w-full gap-3 text-base font-medium transition-all hover:bg-accent hover:shadow-md"
           >

@@ -110,8 +110,8 @@ const WIDGETS: WidgetMeta[] = [
   },
 ];
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
+function getGreeting(now: Date): string {
+  const hour = now.getHours();
   if (hour < 5) return "Up late?";
   if (hour < 12) return "Good morning";
   if (hour < 17) return "Good afternoon";
@@ -130,15 +130,17 @@ const themePresets: Record<ThemePreset, { label: string; className: string }> = 
 
 function DashboardHero({
   preset,
+  now,
   onPresetChange,
   onResetLayout,
 }: {
   preset: ThemePreset;
+  now: Date | null;
   onPresetChange: (preset: ThemePreset) => void;
   onResetLayout: () => void;
 }) {
-  const today = new Date();
-  const dateStr = format(today, "EEEE, MMMM d, yyyy");
+  const greeting = now ? getGreeting(now) : "Welcome back";
+  const dateStr = now ? format(now, "EEEE, MMMM d, yyyy") : "Today";
 
   return (
     <div
@@ -159,7 +161,7 @@ function DashboardHero({
           </div>
           <div className="space-y-1">
             <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-              {getGreeting()}
+              {greeting}
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
               A responsive command center for your calendar, tasks, notes, finance,
@@ -299,6 +301,11 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
   const [themePreset, setThemePreset] = useState<ThemePreset>("default");
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("dashboard-theme-preset") as ThemePreset | null;
@@ -386,6 +393,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
     >
       <DashboardHero
         preset={themePreset}
+        now={now}
         onPresetChange={changeThemePreset}
         onResetLayout={resetLayout}
       />

@@ -46,6 +46,7 @@ function getDayBadge(date: Date): string | null {
 export function CalendarWidget() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [needsReauth, setNeedsReauth] = useState(false);
   const [title, setTitle] = useState("");
   const [startDateTime, setStartDateTime] = useState("");
   const [creating, setCreating] = useState(false);
@@ -69,8 +70,12 @@ export function CalendarWidget() {
 
         if (!response.ok) throw new Error("Failed to load calendar events");
 
-        const payload = (await response.json()) as { events?: CalendarEvent[] };
+        const payload = (await response.json()) as {
+          events?: CalendarEvent[];
+          needsReauth?: boolean;
+        };
         setEvents(payload.events ?? []);
+        setNeedsReauth(Boolean(payload.needsReauth));
       } catch {
         toast.error("Unable to load Google Calendar events.");
       } finally {
@@ -161,6 +166,13 @@ export function CalendarWidget() {
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading events...
+          </div>
+        ) : needsReauth ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+            <CalendarX className="h-8 w-8 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              Reconnect Google Calendar from Settings.
+            </p>
           </div>
         ) : sortedEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">

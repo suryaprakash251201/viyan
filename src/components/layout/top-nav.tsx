@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -109,9 +110,11 @@ function TopNav() {
           <DropdownMenu>
             <DropdownMenuTrigger className="relative h-8 w-8 rounded-full ring-2 ring-border/50 hover:ring-primary/30 transition-all bg-transparent border-none cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               {session?.user?.image ? (
-                <img
+                <Image
                   src={session.user.image}
                   alt={session.user.name ?? "User"}
+                  width={28}
+                  height={28}
                   className="h-7 w-7 rounded-full object-cover"
                 />
               ) : (

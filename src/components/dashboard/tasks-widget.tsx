@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { format, isToday } from "date-fns";
+import { format } from "date-fns";
 import {
   AlertCircle,
   CheckCircle2,
@@ -51,6 +51,7 @@ function sortTasks(tasks: TaskItem[]) {
 export function TasksWidget() {
   const [taskLists, setTaskLists] = useState<TaskListGroup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [needsReauth, setNeedsReauth] = useState(false);
   const [savingTaskId, setSavingTaskId] = useState<string | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [newTaskTitleByList, setNewTaskTitleByList] = useState<Record<string, string>>({});
@@ -61,8 +62,12 @@ export function TasksWidget() {
       try {
         const response = await fetch("/api/google/tasks", { cache: "no-store" });
         if (!response.ok) throw new Error("Failed to load tasks");
-        const payload = (await response.json()) as { taskLists?: TaskListGroup[] };
+        const payload = (await response.json()) as {
+          taskLists?: TaskListGroup[];
+          needsReauth?: boolean;
+        };
         setTaskLists(payload.taskLists ?? []);
+        setNeedsReauth(Boolean(payload.needsReauth));
       } catch {
         toast.error("Unable to load Google Tasks.");
       } finally {
@@ -232,6 +237,13 @@ export function TasksWidget() {
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading tasks...
+          </div>
+        ) : needsReauth ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+            <CheckCircle2 className="h-8 w-8 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              Reconnect Google Tasks from Settings.
+            </p>
           </div>
         ) : taskLists.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">

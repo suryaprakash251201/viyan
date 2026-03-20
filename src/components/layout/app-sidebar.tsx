@@ -1,17 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3,
   BookOpen,
-  BookMarked,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Compass,
-  Gem,
   LayoutDashboard,
   Landmark,
   List,
@@ -234,9 +232,11 @@ function AppSidebar({ visibleWidgets, onToggleWidget }: AppSidebarProps) {
           <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
               {session?.user?.image ? (
-                <img
+                <Image
                   src={session.user.image}
                   alt={session.user.name ?? "User"}
+                  width={28}
+                  height={28}
                   className="h-7 w-7 rounded-full object-cover"
                 />
               ) : (
@@ -255,9 +255,11 @@ function AppSidebar({ visibleWidgets, onToggleWidget }: AppSidebarProps) {
         ) : (
           <div className="flex justify-center py-1">
             {session?.user?.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt={session.user.name ?? "User"}
+                width={28}
+                height={28}
                 className="h-7 w-7 rounded-full object-cover"
               />
             ) : (

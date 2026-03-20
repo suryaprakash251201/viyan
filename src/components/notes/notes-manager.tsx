@@ -17,7 +17,6 @@ import {
   List,
   Pin,
   PinOff,
-  Plus,
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
