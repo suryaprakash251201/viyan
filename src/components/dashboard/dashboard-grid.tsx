@@ -173,7 +173,13 @@ function DashboardHero({ preset, onPresetChange }: { preset: ThemePreset; onPres
                 {label}
               </button>
             ))}
-          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface WidgetCardProps {
   widget: WidgetMeta;
   children?: React.ReactNode;
   stats?: React.ReactNode;
