@@ -1,12 +1,12 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
-import { format, isToday, isTomorrow } from "date-fns";
-import { CalendarPlus, CalendarX, ChevronRight, Clock, Loader2 } from "lucide-react";
+import { format, isToday, isTomorrow, formatDistanceStrict } from "date-fns";
+import { CalendarPlus, CalendarX, ChevronRight, Clock, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { WidgetSkeleton } from "./widget-skeleton";
 
 interface CalendarEvent {
   id: string;
@@ -20,6 +20,7 @@ interface CalendarEvent {
     date?: string;
   };
   colorId?: string;
+  htmlLink?: string;
 }
 
 const COLOR_MAP: Record<string, { bg: string; border: string; text: string }> = {
@@ -35,6 +36,19 @@ function toDisplayDate(event: CalendarEvent): Date | null {
   if (!raw) return null;
   const date = new Date(raw);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getEventDuration(event: CalendarEvent): string | null {
+  const start = event.start?.dateTime ? new Date(event.start.dateTime) : null;
+  const end = event.end?.dateTime ? new Date(event.end.dateTime) : null;
+  
+  if (!start || !end) return event.start?.date ? "All day" : null;
+  
+  try {
+    return formatDistanceStrict(start, end);
+  } catch {
+    return null;
+  }
 }
 
 function getDayBadge(date: Date): string | null {
@@ -128,6 +142,10 @@ export function CalendarWidget() {
     return d && isToday(d);
   }).length;
 
+  if (loading) {
+    return <WidgetSkeleton />;
+  }
+
   return (
     <div className="flex h-full flex-col gap-3">
       {/* Quick add form */}
@@ -162,12 +180,7 @@ export function CalendarWidget() {
 
       {/* Events list */}
       <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60">
-        {loading ? (
-          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading events...
-          </div>
-        ) : needsReauth ? (
+        {needsReauth ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <CalendarX className="h-8 w-8 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">
@@ -182,55 +195,83 @@ export function CalendarWidget() {
         ) : (
           <div className="space-y-1 p-2">
             {/* Summary bar */}
-            <div className="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 mb-2">
+            <div className="flex items-center justify-between rounded-lg bg-card px-3 py-2 mb-2 border border-border/40">
               <div className="flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
-                  {todayCount > 0 ? `${todayCount} today` : "No events today"}
+                <Clock className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-semibold">
+                  {todayCount > 0 ? `${todayCount} Today` : "No events today"}
                 </span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground">
-                {upcomingCount} upcoming
-              </span>
+              <a
+                href="https://calendar.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon-xs" }),
+                  "h-6 w-6 text-muted-foreground hover:text-primary"
+                )}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
 
-            {sortedEvents.map((event) => {
-              const date = toDisplayDate(event);
-              const color = COLOR_MAP[event.colorId ?? ""] ?? {
-                bg: "bg-muted/60",
-                border: "border-border/60",
-                text: "text-foreground",
-              };
-              const dayBadge = date ? getDayBadge(date) : null;
+            <div className="space-y-1.5">
+              {sortedEvents.map((event) => {
+                const date = toDisplayDate(event);
+                const duration = getEventDuration(event);
+                const color = COLOR_MAP[event.colorId ?? ""] ?? {
+                  bg: "bg-muted/60",
+                  border: "border-border/60",
+                  text: "text-foreground",
+                };
+                const dayBadge = date ? getDayBadge(date) : null;
 
-              return (
-                <div
-                  key={event.id}
-                  className={`flex items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-colors hover:bg-muted/30 ${color.bg} ${color.border}`}
-                >
-                  {/* Color indicator */}
-                  <div className={`h-1.5 w-1.5 rounded-full shrink-0 ${color.text.replace("text-", "bg-")}`} />
+                return (
+                  <div
+                    key={event.id}
+                    className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all hover:bg-muted/30 ${color.bg} ${color.border}`}
+                  >
+                    {/* Time sidebar */}
+                    <div className="flex flex-col items-center gap-0.5 min-w-[40px] border-r border-border/40 pr-2">
+                      <span className="text-[10px] font-bold uppercase">{date ? format(date, "MMM") : "-"}</span>
+                      <span className="text-sm font-black leading-none">{date ? format(date, "d") : "-"}</span>
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium">{event.summary}</p>
-                    {date && (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        {dayBadge && (
-                          <Badge variant="outline" className="h-4 px-1.5 text-[10px] font-semibold leading-none">
-                            {dayBadge}
-                          </Badge>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-xs font-bold">{event.summary}</p>
+                        {duration && (
+                          <span className="shrink-0 text-[10px] text-muted-foreground/80 font-medium">
+                            {duration}
+                          </span>
                         )}
-                        <span className="text-[10px] text-muted-foreground">
-                          {format(date, "EEE, MMM d · h:mm a")}
-                        </span>
                       </div>
-                    )}
-                  </div>
+                      {date && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          {dayBadge && (
+                            <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-bold leading-none bg-primary/20 text-primary border-none">
+                              {dayBadge}
+                            </Badge>
+                          )}
+                          <span className="text-[10px] text-muted-foreground font-medium">
+                            {format(date, "eee · h:mm a")}
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-                  <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-                </div>
-              );
-            })}
+                    <a 
+                      href={event.htmlLink || "https://calendar.google.com"} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-primary"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

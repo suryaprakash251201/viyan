@@ -10,6 +10,7 @@ type GoogleTask = {
   status?: "needsAction" | "completed";
   due?: string;
   completed?: string;
+  starred?: boolean;
 };
 
 type GoogleTaskList = {
@@ -116,6 +117,7 @@ export async function GET() {
           status: task.status ?? "needsAction",
           due: task.due,
           completed: task.completed,
+          starred: task.starred ?? false,
         })),
       };
     })
@@ -171,6 +173,7 @@ export async function POST(request: Request) {
         status: createdResult.data.status ?? "needsAction",
         due: createdResult.data.due,
         completed: createdResult.data.completed,
+        starred: createdResult.data.starred ?? false,
       },
     },
     { status: 201 }
@@ -189,18 +192,29 @@ export async function PATCH(request: Request) {
         taskListId?: string;
         taskId?: string;
         completed?: boolean;
+        starred?: boolean;
       }
     | null;
 
   const taskListId = payload?.taskListId?.trim();
   const taskId = payload?.taskId?.trim();
   const completed = payload?.completed;
+  const starred = payload?.starred;
 
-  if (!taskListId || !taskId || typeof completed !== "boolean") {
+  if (!taskListId || !taskId || (typeof completed !== "boolean" && typeof starred !== "boolean")) {
     return NextResponse.json(
-      { error: "taskListId, taskId and completed are required" },
+      { error: "taskListId, taskId and (completed or starred) are required" },
       { status: 400 }
     );
+  }
+
+  const updateBody: any = {};
+  if (typeof completed === "boolean") {
+    updateBody.status = completed ? "completed" : "needsAction";
+    updateBody.completed = completed ? new Date().toISOString() : null;
+  }
+  if (typeof starred === "boolean") {
+    updateBody.starred = starred;
   }
 
   const updatedResult = await callGoogle<GoogleTask>(
@@ -208,17 +222,7 @@ export async function PATCH(request: Request) {
     `${TASKS_BASE_URL}/lists/${taskListId}/tasks/${taskId}`,
     {
       method: "PATCH",
-      body: JSON.stringify(
-        completed
-          ? {
-              status: "completed",
-              completed: new Date().toISOString(),
-            }
-          : {
-              status: "needsAction",
-              completed: null,
-            }
-      ),
+      body: JSON.stringify(updateBody),
     }
   );
 
@@ -236,6 +240,7 @@ export async function PATCH(request: Request) {
       status: updatedResult.data.status ?? "needsAction",
       due: updatedResult.data.due,
       completed: updatedResult.data.completed,
+      starred: updatedResult.data.starred ?? false,
     },
   });
 }

@@ -9,6 +9,7 @@ import {
   Clock,
   Loader2,
   Plus,
+  Star,
   Trash2,
   TrendingUp,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { WidgetSkeleton } from "./widget-skeleton";
 
 interface TaskItem {
   id: string;
@@ -23,6 +25,7 @@ interface TaskItem {
   status: "needsAction" | "completed";
   due?: string;
   completed?: string;
+  starred?: boolean;
 }
 
 interface TaskListGroup {
@@ -195,6 +198,72 @@ export function TasksWidget() {
     }
   };
 
+  const onToggleStarred = async (taskListId: string, task: TaskItem) => {
+    const nextStarred = !task.starred;
+    setSavingTaskId(task.id);
+
+    try {
+      const response = await fetch("/api/google/tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskListId, taskId: task.id, starred: nextStarred }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update task priority");
+
+      const payload = (await response.json()) as { task?: TaskItem };
+
+      if (payload.task) {
+        setTaskLists((previous) =>
+          previous.map((list) =>
+            list.id === taskListId
+              ? {
+                  ...list,
+                  tasks: list.tasks.map((item) => (item.id === task.id ? payload.task! : item)),
+                }
+              : list
+          )
+        );
+      }
+    } catch {
+      toast.error("Could not update task priority.");
+    } finally {
+      setSavingTaskId(null);
+    }
+  };
+
+  const onClearCompleted = async (taskListId: string) => {
+    const completedTasks = taskLists
+      .find((l) => l.id === taskListId)
+      ?.tasks.filter((t) => t.status === "completed");
+
+    if (!completedTasks?.length) return;
+
+    const promise = Promise.all(
+      completedTasks.map((t) =>
+        fetch(
+          `/api/google/tasks?taskListId=${encodeURIComponent(taskListId)}&taskId=${encodeURIComponent(t.id)}`,
+          { method: "DELETE" }
+        )
+      )
+    );
+
+    toast.promise(promise, {
+      loading: "Clearing completed tasks...",
+      success: () => {
+        setTaskLists((prev) =>
+          prev.map((list) =>
+            list.id === taskListId
+              ? { ...list, tasks: list.tasks.filter((t) => t.status !== "completed") }
+              : list
+          )
+        );
+        return "Cleared completed tasks.";
+      },
+      error: "Failed to clear some tasks.",
+    });
+  };
+
   return (
     <div className="flex h-full flex-col gap-3">
       {/* Summary stats */}
@@ -234,10 +303,7 @@ export function TasksWidget() {
       {/* Task lists */}
       <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60 p-2 space-y-2">
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading tasks...
-          </div>
+          <WidgetSkeleton />
         ) : needsReauth ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <CheckCircle2 className="h-8 w-8 text-muted-foreground/50" />
@@ -275,6 +341,16 @@ export function TasksWidget() {
                   </div>
                   {listOpen > 0 && (
                     <span className="text-[10px] font-medium text-primary">{listOpen} left</span>
+                  )}
+                  {listDone > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onClearCompleted(list.id)}
+                      className="h-5 text-[10px] text-muted-foreground hover:text-destructive"
+                    >
+                      Clear Done
+                    </Button>
                   )}
                 </div>
 
@@ -322,7 +398,7 @@ export function TasksWidget() {
                     return (
                       <li
                         key={task.id}
-                        className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 transition-colors ${
+                        className={`group/task flex items-center gap-2 rounded-lg border px-2 py-1.5 transition-colors ${
                           completed
                             ? "border-border/40 bg-muted/20"
                             : overdue
@@ -358,30 +434,42 @@ export function TasksWidget() {
                           {task.title}
                         </span>
 
-                        {dueDate && !completed && (
-                          <div className="flex items-center gap-0.5 shrink-0">
-                            <Clock className={`h-3 w-3 ${overdue ? "text-red-500" : "text-muted-foreground"}`} />
-                            <span className={`text-[10px] ${overdue ? "text-red-500" : "text-muted-foreground"}`}>
-                              {format(dueDate, "MMM d")}
-                            </span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 opacity-0 group-hover/task:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => void onToggleStarred(list.id, task)}
+                            className={`p-1 transition-colors ${
+                              task.starred ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"
+                            }`}
+                          >
+                            <Star className={`h-3 w-3 ${task.starred ? "fill-current" : ""}`} />
+                          </button>
 
-                        <Button
-                          type="button"
-                          size="icon-xs"
-                          variant="ghost"
-                          disabled={deletingTaskId === task.id}
-                          onClick={() => void onDeleteTask(list.id, task.id)}
-                          className="h-5 w-5 shrink-0 opacity-0 group-hover:opacity-100 hover:text-destructive transition-opacity"
-                          aria-label={`Delete ${task.title}`}
-                        >
-                          {deletingTaskId === task.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3 w-3" />
+                          {dueDate && !completed && (
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <Clock className={`h-3 w-3 ${overdue ? "text-red-500" : "text-muted-foreground"}`} />
+                              <span className={`text-[10px] ${overdue ? "text-red-500" : "text-muted-foreground"}`}>
+                                {format(dueDate, "MMM d")}
+                              </span>
+                            </div>
                           )}
-                        </Button>
+
+                          <Button
+                            type="button"
+                            size="icon-xs"
+                            variant="ghost"
+                            disabled={deletingTaskId === task.id}
+                            onClick={() => void onDeleteTask(list.id, task.id)}
+                            className="h-5 w-5 shrink-0 hover:text-destructive"
+                            aria-label={`Delete ${task.title}`}
+                          >
+                            {deletingTaskId === task.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </li>
                     );
                   })}
