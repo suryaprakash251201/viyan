@@ -168,6 +168,12 @@ export function FinanceTracker() {
     });
   }, [transactions]);
 
+  const [chartsReady, setChartsReady] = useState(false);
+
+  useEffect(() => {
+    setChartsReady(true);
+  }, []);
+
   const budgetProgressData = useMemo(() => {
     const spentByCategory = new Map<TransactionCategory, number>();
     transactions
@@ -380,36 +386,54 @@ export function FinanceTracker() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle className="text-base">Spend by Category</CardTitle>
           </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryBarData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
-                <Bar dataKey="value" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent className="h-72 min-w-0">
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryBarData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="category" tick={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
+                  <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
+                  <Bar dataKey="value" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/20 text-sm text-muted-foreground">
+                Preparing chart...
+              </div>
+            )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle className="text-base">Balance Over Time</CardTitle>
           </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={balanceLineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
-                <Line type="monotone" dataKey="balance" stroke="var(--color-chart-3)" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="h-72 min-w-0">
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={balanceLineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
+                  <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
+                  <Line
+                    type="monotone"
+                    dataKey="balance"
+                    stroke="var(--color-chart-3)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/20 text-sm text-muted-foreground">
+                Preparing chart...
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

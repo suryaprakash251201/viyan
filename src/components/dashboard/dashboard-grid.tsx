@@ -391,7 +391,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
       />
 
       <Responsive
-        className="layout"
+        className="layout min-w-0"
         breakpoints={DASHBOARD_BREAKPOINTS}
         cols={DASHBOARD_COLS}
         layouts={layouts}
@@ -448,7 +448,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
           };
 
           return (
-            <div key={id} className="pb-1">
+            <div key={id} className="min-w-0 pb-1">
               <WidgetCard widget={widget}>
                 <ErrorBoundary>{renderWidget()}</ErrorBoundary>
               </WidgetCard>

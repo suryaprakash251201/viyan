@@ -135,6 +135,9 @@ export function BookmarksManager() {
     [bookmarks, editingId]
   );
 
+  const bookmarkCount = bookmarks.length;
+  const categoryCount = grouped.length;
+
   const onCreate = async () => {
     if (!label.trim() || !url.trim()) {
       toast.error("Label and URL are required");
@@ -189,12 +192,30 @@ export function BookmarksManager() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 md:p-6">
-      <header className="rounded-3xl border border-border/60 bg-card/70 p-5 backdrop-blur-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Quick Links
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">Your personal launchpad</h1>
+    <section className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 md:p-6">
+      <header className="overflow-hidden rounded-3xl border border-border/60 bg-card/75 p-5 shadow-sm backdrop-blur-sm md:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Quick Links
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              Your personal launchpad
+            </h1>
+            <p className="max-w-2xl text-sm text-muted-foreground">
+              Keep your most-used destinations grouped, branded, and one click away with automatic favicons.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <div className="rounded-full border border-border/60 bg-background/70 px-3 py-1.5">
+              {bookmarkCount} bookmarks
+            </div>
+            <div className="rounded-full border border-border/60 bg-background/70 px-3 py-1.5">
+              {categoryCount} categories
+            </div>
+          </div>
+        </div>
       </header>
 
       <Card className="border-border/60 bg-card/80 shadow-sm">
@@ -258,14 +279,19 @@ export function BookmarksManager() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {grouped.map(([group, items]) => (
           <Card key={group} className="border-border/60 bg-card/80 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base">{group}</CardTitle>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle className="text-base">{group}</CardTitle>
+                <div className="rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground">
+                  {items.length}
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
               {items.map((bookmark) => (
                 <div
                   key={bookmark.id}
-                  className="flex items-center justify-between gap-2 rounded-xl border border-border/70 bg-background/70 px-2.5 py-2"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-background/70 px-3 py-2.5 transition hover:border-border hover:bg-background"
                 >
                   <a
                     href={bookmark.url}
@@ -273,21 +299,27 @@ export function BookmarksManager() {
                     rel="noopener noreferrer"
                     className="min-w-0 flex-1"
                   >
-                    <p className="flex items-center gap-2 truncate text-sm font-medium">
-                      {isFaviconUrl(bookmark.icon) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={bookmark.icon ?? ""}
-                          alt=""
-                          className="h-4 w-4 rounded-sm"
-                          loading="lazy"
-                        />
-                      ) : bookmark.icon ? (
-                        <span>{bookmark.icon}</span>
-                      ) : null}
-                      {bookmark.label}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{bookmark.url}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-sm">
+                        {isFaviconUrl(bookmark.icon) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={bookmark.icon ?? ""}
+                            alt=""
+                            className="h-4 w-4 rounded-sm"
+                            loading="lazy"
+                          />
+                        ) : bookmark.icon ? (
+                          <span>{bookmark.icon}</span>
+                        ) : (
+                          <Bookmark className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{bookmark.label}</p>
+                        <p className="truncate text-xs text-muted-foreground">{bookmark.url}</p>
+                      </div>
+                    </div>
                   </a>
                   <div className="flex items-center gap-1">
                     <Button
