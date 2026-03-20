@@ -7,6 +7,7 @@ import { GOOGLE_OAUTH_SCOPE } from "@/lib/constants";
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
