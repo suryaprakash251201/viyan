@@ -124,12 +124,21 @@ function getGreeting(): string {
   return "Good night";
 }
 
-function DashboardHero() {
+type ThemePreset = "default" | "ocean" | "forest" | "sunset";
+
+const themePresets: Record<ThemePreset, { label: string; className: string }> = {
+  default: { label: "Energize", className: "theme-energize" },
+  ocean: { label: "Ocean", className: "theme-ocean" },
+  forest: { label: "Forest", className: "theme-forest" },
+  sunset: { label: "Sunset", className: "theme-sunset" },
+};
+
+function DashboardHero({ preset, onPresetChange }: { preset: ThemePreset; onPresetChange: (preset: ThemePreset) => void }) {
   const today = new Date();
   const dateStr = format(today, "EEEE, MMMM d, yyyy");
 
   return (
-    <div className="dashboard-hero rounded-3xl border border-border/50 p-5 md:p-7 relative overflow-hidden">
+    <div className={`dashboard-hero rounded-3xl border border-border/50 p-5 md:p-7 relative overflow-hidden ${themePresets[preset].className}`}>
       {/* Background accent orbs */}
       <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
       <div className="absolute -left-10 -bottom-10 h-48 w-48 rounded-full bg-chart-3/10 blur-3xl pointer-events-none" />
@@ -153,23 +162,18 @@ function DashboardHero() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card/70 px-4 py-2.5 backdrop-blur-sm">
-            <CheckSquare className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Live sync</span>
-            <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
+          <div className="flex flex-wrap items-center gap-2">
+            {Object.entries(themePresets).map(([key, { label }]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => onPresetChange(key as ThemePreset)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium ${preset === key ? "border-primary bg-primary/20 text-primary" : "border-border/50 text-muted-foreground hover:bg-card"}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-1 rounded-2xl border border-border/60 bg-card/70 px-4 py-2.5 backdrop-blur-sm">
-            <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Drag to arrange</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface WidgetCardProps {
   widget: WidgetMeta;
   children?: React.ReactNode;
   stats?: React.ReactNode;
@@ -264,6 +268,19 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
 export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
+  const [themePreset, setThemePreset] = useState<ThemePreset>("default");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("dashboard-theme-preset") as ThemePreset | null;
+    if (stored && themePresets[stored]) {
+      setThemePreset(stored);
+    }
+  }, []);
+
+  const changeThemePreset = (preset: ThemePreset) => {
+    setThemePreset(preset);
+    window.localStorage.setItem("dashboard-theme-preset", preset);
+  };
   const [layouts, setLayouts] = useState<DashboardLayouts>(
     Object.keys(initialLayouts).length > 0
       ? initialLayouts
@@ -330,7 +347,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
       ref={containerRef}
       className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 md:p-6"
     >
-      <DashboardHero />
+      <DashboardHero preset={themePreset} onPresetChange={changeThemePreset} />
 
       <Responsive
         className="layout"
