@@ -9,19 +9,14 @@ import {
   Bookmark,
   CalendarClock,
   CheckCircle2,
-  CheckSquare,
   Clock,
-  Ellipsis,
   ExternalLink,
-  LayoutGrid,
   Landmark,
-  Loader2,
   MoreHorizontal,
   NotebookPen,
   RefreshCw,
   Sparkles,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -218,7 +213,6 @@ interface WidgetCardProps {
 function WidgetCard({ widget, children, stats }: WidgetCardProps) {
   const Icon = widget.icon;
   const [refreshing, setRefreshing] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleRefresh = () => {
     setRefreshing(true);

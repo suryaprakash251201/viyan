@@ -1,9 +1,13 @@
 import { FinanceTracker } from "@/components/finance/finance-tracker";
+import { SectionPageShell } from "@/components/layout/section-page-shell";
 
 export default function FinancePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/35">
+    <SectionPageShell
+      title="Finance Tracker"
+      description="Income, expenses, budgets, and trends in one place."
+    >
       <FinanceTracker />
-    </main>
+    </SectionPageShell>
   );
 }

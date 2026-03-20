@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, Pencil, Plus, Trash2, Bookmark } from "lucide-react";
+import { ExternalLink, Pencil, Trash2, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,10 @@ type BookmarkItem = {
 };
 
 const DEFAULT_CATEGORIES = ["Dev Tools", "Social", "Self-hosted Services", "Misc"];
+
+function isFaviconUrl(value: string | null): boolean {
+  return Boolean(value && /^https?:\/\//i.test(value));
+}
 
 function BookmarkEditor({
   bookmark,
@@ -186,18 +190,18 @@ export function BookmarksManager() {
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 md:p-6">
-      <header className="rounded-xl border border-border/70 bg-card/70 p-4">
+      <header className="rounded-3xl border border-border/60 bg-card/70 p-5 backdrop-blur-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Quick Links
         </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Your personal launchpad</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">Your personal launchpad</h1>
       </header>
 
-      <Card>
+      <Card className="border-border/60 bg-card/80 shadow-sm">
         <CardHeader>
           <CardTitle className="text-base">Add bookmark</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-2 md:grid-cols-5">
+        <CardContent className="grid gap-3 md:grid-cols-5">
           <Input placeholder="Label" value={label} onChange={(event) => setLabel(event.target.value)} />
           <Input placeholder="URL" value={url} onChange={(event) => setUrl(event.target.value)} />
           <Input
@@ -225,7 +229,7 @@ export function BookmarksManager() {
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" role="status" aria-busy="true">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
+            <Card key={i} className="border-border/60 bg-card/80 shadow-sm">
               <CardHeader>
                 <BookmarkSkeleton />
               </CardHeader>
@@ -240,7 +244,7 @@ export function BookmarksManager() {
       ) : null}
 
       {!loading && grouped.length === 0 ? (
-        <Card>
+        <Card className="border-border/60 bg-card/80 shadow-sm">
           <CardContent className="py-8">
             <EmptyState
               icon={Bookmark}
@@ -253,7 +257,7 @@ export function BookmarksManager() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {grouped.map(([group, items]) => (
-          <Card key={group}>
+          <Card key={group} className="border-border/60 bg-card/80 shadow-sm">
             <CardHeader>
               <CardTitle className="text-base">{group}</CardTitle>
             </CardHeader>
@@ -261,7 +265,7 @@ export function BookmarksManager() {
               {items.map((bookmark) => (
                 <div
                   key={bookmark.id}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-border/70 bg-background px-2.5 py-2"
+                  className="flex items-center justify-between gap-2 rounded-xl border border-border/70 bg-background/70 px-2.5 py-2"
                 >
                   <a
                     href={bookmark.url}
@@ -269,8 +273,18 @@ export function BookmarksManager() {
                     rel="noopener noreferrer"
                     className="min-w-0 flex-1"
                   >
-                    <p className="truncate text-sm font-medium">
-                      {bookmark.icon ? `${bookmark.icon} ` : ""}
+                    <p className="flex items-center gap-2 truncate text-sm font-medium">
+                      {isFaviconUrl(bookmark.icon) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={bookmark.icon ?? ""}
+                          alt=""
+                          className="h-4 w-4 rounded-sm"
+                          loading="lazy"
+                        />
+                      ) : bookmark.icon ? (
+                        <span>{bookmark.icon}</span>
+                      ) : null}
                       {bookmark.label}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">{bookmark.url}</p>
@@ -301,7 +315,9 @@ export function BookmarksManager() {
                       loading={deletingId === bookmark.id}
                       onClick={() => void onDelete(bookmark.id)}
                       aria-label="Delete bookmark"
-                    />
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}

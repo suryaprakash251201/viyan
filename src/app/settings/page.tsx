@@ -1,9 +1,13 @@
 import { SettingsManager } from "@/components/settings/settings-manager";
+import { SectionPageShell } from "@/components/layout/section-page-shell";
 
 export default function SettingsPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/35">
+    <SectionPageShell
+      title="Settings"
+      description="Tune appearance, localization, and account controls."
+    >
       <SettingsManager />
-    </main>
+    </SectionPageShell>
   );
 }

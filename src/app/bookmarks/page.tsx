@@ -1,9 +1,13 @@
 import { BookmarksManager } from "@/components/bookmarks/bookmarks-manager";
+import { SectionPageShell } from "@/components/layout/section-page-shell";
 
 export default function BookmarksPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/35">
+    <SectionPageShell
+      title="Quick Links"
+      description="Your personal launchpad for fast access to frequently used sites."
+    >
       <BookmarksManager />
-    </main>
+    </SectionPageShell>
   );
 }

@@ -1,9 +1,13 @@
 import { NotesManager } from "@/components/notes/notes-manager";
+import { SectionPageShell } from "@/components/layout/section-page-shell";
 
 export default function NotesPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/35">
+    <SectionPageShell
+      title="Notes"
+      description="Capture ideas, organize them with tags, and keep them searchable."
+    >
       <NotesManager />
-    </main>
+    </SectionPageShell>
   );
 }

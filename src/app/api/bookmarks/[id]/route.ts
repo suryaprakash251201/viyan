@@ -6,6 +6,19 @@ function unauthorizedResponse() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
+function normalizeUrl(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function getFaviconUrl(url: string): string {
+  try {
+    const hostname = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+  } catch {
+    return "";
+  }
+}
+
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> }
@@ -41,9 +54,7 @@ export async function PATCH(
   let normalizedUrl = payload?.url?.trim();
 
   if (normalizedUrl) {
-    if (!/^https?:\/\//i.test(normalizedUrl)) {
-      normalizedUrl = `https://${normalizedUrl}`;
-    }
+    normalizedUrl = normalizeUrl(normalizedUrl);
 
     try {
       new URL(normalizedUrl);
@@ -57,7 +68,11 @@ export async function PATCH(
     data: {
       ...(typeof payload?.label === "string" ? { label: payload.label.trim() || "Untitled" } : {}),
       ...(normalizedUrl ? { url: normalizedUrl } : {}),
-      ...(payload && "icon" in payload ? { icon: payload.icon?.trim() || null } : {}),
+      ...(payload && "icon" in payload
+        ? {
+            icon: payload.icon?.trim() || (normalizedUrl ? getFaviconUrl(normalizedUrl) : null),
+          }
+        : {}),
       ...(typeof payload?.category === "string" ? { category: payload.category.trim() || "Misc" } : {}),
       ...(typeof payload?.order === "number" ? { order: payload.order } : {}),
     },
