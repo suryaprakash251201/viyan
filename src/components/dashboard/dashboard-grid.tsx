@@ -133,46 +133,76 @@ const themePresets: Record<ThemePreset, { label: string; className: string }> = 
   sunset: { label: "Sunset", className: "theme-sunset" },
 };
 
-function DashboardHero({ preset, onPresetChange }: { preset: ThemePreset; onPresetChange: (preset: ThemePreset) => void }) {
+function DashboardHero({
+  preset,
+  onPresetChange,
+  onResetLayout,
+}: {
+  preset: ThemePreset;
+  onPresetChange: (preset: ThemePreset) => void;
+  onResetLayout: () => void;
+}) {
   const today = new Date();
   const dateStr = format(today, "EEEE, MMMM d, yyyy");
 
   return (
-    <div className={`dashboard-hero rounded-3xl border border-border/50 p-5 md:p-7 relative overflow-hidden ${themePresets[preset].className}`}>
-      {/* Background accent orbs */}
-      <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-      <div className="absolute -left-10 -bottom-10 h-48 w-48 rounded-full bg-chart-3/10 blur-3xl pointer-events-none" />
+    <div
+      className={`dashboard-hero relative overflow-hidden rounded-3xl border border-border/50 p-5 md:p-7 ${themePresets[preset].className}`}
+    >
+      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+      <div className="pointer-events-none absolute -left-10 -bottom-10 h-48 w-48 rounded-full bg-chart-3/10 blur-3xl" />
 
-      <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
+      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
-              <Sparkles className="h-3.5 w-3.5 text-primary-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
+              <Sparkles className="h-4 w-4 text-primary-foreground" />
             </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
               Personal Dashboard
             </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
-            {getGreeting()}
-          </h1>
+          <div className="space-y-1">
+            <h1 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">
+              {getGreeting()}
+            </h1>
+            <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
+              A responsive command center for your calendar, tasks, notes, finance,
+              and quick links.
+            </p>
+          </div>
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
             {dateStr}
           </p>
         </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {Object.entries(themePresets).map(([key, { label }]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onPresetChange(key as ThemePreset)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium ${preset === key ? "border-primary bg-primary/20 text-primary" : "border-border/50 text-muted-foreground hover:bg-card"}`}
-              >
-                {label}
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="rounded-full border border-border/60 bg-card/70 px-3 py-2 text-xs text-muted-foreground backdrop-blur-sm">
+            Layout sync on
+          </div>
+          <button
+            type="button"
+            onClick={onResetLayout}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-card"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Reset layout
+          </button>
+          {Object.entries(themePresets).map(([key, { label }]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onPresetChange(key as ThemePreset)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                preset === key
+                  ? "border-primary bg-primary/20 text-primary"
+                  : "border-border/50 text-muted-foreground hover:bg-card"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -287,6 +317,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
     setThemePreset(preset);
     window.localStorage.setItem("dashboard-theme-preset", preset);
   };
+
   const [layouts, setLayouts] = useState<DashboardLayouts>(
     Object.keys(initialLayouts).length > 0
       ? initialLayouts
@@ -348,12 +379,22 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
     }, 450);
   }, []);
 
+  const resetLayout = useCallback(() => {
+    setLayouts(DEFAULT_DASHBOARD_LAYOUTS);
+    persistLayout(DEFAULT_DASHBOARD_LAYOUTS);
+    toast.success("Dashboard layout reset to default.");
+  }, [persistLayout]);
+
   return (
     <section
       ref={containerRef}
       className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 md:p-6"
     >
-      <DashboardHero preset={themePreset} onPresetChange={changeThemePreset} />
+      <DashboardHero
+        preset={themePreset}
+        onPresetChange={changeThemePreset}
+        onResetLayout={resetLayout}
+      />
 
       <Responsive
         className="layout"
