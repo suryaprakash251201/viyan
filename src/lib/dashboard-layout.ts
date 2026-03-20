@@ -1,4 +1,6 @@
-import type { Layout, Layouts } from "react-grid-layout";
+import type { LayoutItem, ResponsiveLayouts } from "react-grid-layout";
+
+export type DashboardLayouts = ResponsiveLayouts;
 
 export const DASHBOARD_BREAKPOINTS = {
   lg: 1200,
@@ -16,7 +18,7 @@ export const DASHBOARD_COLS = {
   xxs: 2,
 } as const;
 
-export const DEFAULT_DASHBOARD_LAYOUTS: Layouts = {
+export const DEFAULT_DASHBOARD_LAYOUTS: DashboardLayouts = {
   lg: [
     { i: "calendar", x: 0, y: 0, w: 6, h: 6, minW: 3, minH: 4 },
     { i: "tasks", x: 6, y: 0, w: 6, h: 6, minW: 3, minH: 4 },
@@ -54,7 +56,7 @@ export const DEFAULT_DASHBOARD_LAYOUTS: Layouts = {
   ],
 };
 
-function isLayoutItem(value: unknown): value is Layout {
+function isLayoutItem(value: unknown): value is LayoutItem {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -70,7 +72,7 @@ function isLayoutItem(value: unknown): value is Layout {
   );
 }
 
-export function isValidDashboardLayouts(value: unknown): value is Layouts {
+export function isValidDashboardLayouts(value: unknown): value is DashboardLayouts {
   if (!value || typeof value !== "object") {
     return false;
   }

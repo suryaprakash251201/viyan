@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -49,11 +50,21 @@ export async function PATCH(
       }
     | null;
 
+  const contentUpdate =
+    payload && "content" in payload
+      ? {
+          content:
+            payload.content === null
+              ? Prisma.JsonNull
+              : (payload.content as Prisma.InputJsonValue),
+        }
+      : {};
+
   const note = await prisma.note.update({
     where: { id },
     data: {
       ...(typeof payload?.title === "string" ? { title: payload.title.trim() || "Untitled note" } : {}),
-      ...(payload && "content" in payload ? { content: payload.content } : {}),
+      ...contentUpdate,
       ...(payload && "tags" in payload ? { tags: normalizeTags(payload.tags) } : {}),
       ...(typeof payload?.pinned === "boolean" ? { pinned: payload.pinned } : {}),
     },

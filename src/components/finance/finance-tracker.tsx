@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress";
+import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
 type TransactionType = "INCOME" | "EXPENSE";
@@ -370,7 +370,7 @@ export function FinanceTracker() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="category" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                <Tooltip formatter={(value: number) => formatINR(value)} />
+                <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
                 <Bar dataKey="value" fill="var(--color-chart-2)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -386,7 +386,7 @@ export function FinanceTracker() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                <Tooltip formatter={(value: number) => formatINR(value)} />
+                <Tooltip formatter={(value) => formatINR(Number(value ?? 0))} />
                 <Line type="monotone" dataKey="balance" stroke="var(--color-chart-3)" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -534,9 +534,9 @@ export function FinanceTracker() {
                     <ProgressLabel>
                       {CATEGORY_OPTIONS.find((entry) => entry.value === budget.category)?.label}
                     </ProgressLabel>
-                    <ProgressValue>
+                    <span className="ml-auto text-sm text-muted-foreground tabular-nums">
                       {formatINR(budget.spent)} / {formatINR(budget.limit)}
-                    </ProgressValue>
+                    </span>
                   </div>
                 </Progress>
               ))}

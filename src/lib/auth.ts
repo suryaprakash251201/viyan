@@ -29,22 +29,32 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: "/login",
   },
-  callbacks: {
+  events: {
     async signIn({ account }) {
-      // Encrypt tokens before storing
-      if (account) {
-        if (account.access_token) {
-          account.encrypted_access_token = encrypt(account.access_token);
-        }
-        if (account.refresh_token) {
-          account.encrypted_refresh_token = encrypt(account.refresh_token);
-        }
-        if (account.expires_at) {
-          account.token_expires_at = new Date(account.expires_at * 1000);
-        }
+      if (!account?.provider || !account.providerAccountId) {
+        return;
       }
-      return true;
+
+      await prisma.account.updateMany({
+        where: {
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+        },
+        data: {
+          encrypted_access_token: account.access_token
+            ? encrypt(account.access_token)
+            : null,
+          encrypted_refresh_token: account.refresh_token
+            ? encrypt(account.refresh_token)
+            : null,
+          token_expires_at: account.expires_at
+            ? new Date(account.expires_at * 1000)
+            : null,
+        },
+      });
     },
+  },
+  callbacks: {
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;

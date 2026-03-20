@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { Responsive, WidthProvider, type Layouts } from "react-grid-layout";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Responsive } from "react-grid-layout";
 import { LayoutGrid, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,16 +18,15 @@ import {
   DASHBOARD_BREAKPOINTS,
   DASHBOARD_COLS,
   DEFAULT_DASHBOARD_LAYOUTS,
+  type DashboardLayouts,
 } from "@/lib/dashboard-layout";
 import { CalendarWidget } from "@/components/dashboard/calendar-widget";
 import { TasksWidget } from "@/components/dashboard/tasks-widget";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
-
 interface DashboardGridProps {
-  initialLayouts: Layouts;
+  initialLayouts: DashboardLayouts;
 }
 
 const WIDGETS = [
@@ -82,7 +81,9 @@ function ThemeToggleButton() {
 }
 
 export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
-  const [layouts, setLayouts] = useState<Layouts>(
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(1200);
+  const [layouts, setLayouts] = useState<DashboardLayouts>(
     Object.keys(initialLayouts).length > 0
       ? initialLayouts
       : DEFAULT_DASHBOARD_LAYOUTS
@@ -95,7 +96,34 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
     []
   );
 
-  const persistLayout = useCallback((nextLayouts: Layouts) => {
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const updateWidth = () => {
+      setContainerWidth(container.clientWidth || 1200);
+    };
+
+    updateWidth();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateWidth);
+      return () => {
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const persistLayout = useCallback((nextLayouts: DashboardLayouts) => {
     const serialized = JSON.stringify(nextLayouts);
     if (serialized === lastSavedRef.current) {
       return;
@@ -127,7 +155,10 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
   }, []);
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-6">
+    <section
+      ref={containerRef}
+      className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-6"
+    >
       <header className="rounded-xl border border-border/70 bg-card/70 p-4 backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -142,17 +173,17 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
         </div>
       </header>
 
-      <ResponsiveGridLayout
+      <Responsive
         className="layout"
         breakpoints={DASHBOARD_BREAKPOINTS}
         cols={DASHBOARD_COLS}
         layouts={layouts}
+        width={containerWidth}
         rowHeight={24}
-        compactType="vertical"
-        draggableHandle=".widget-drag-handle"
         onLayoutChange={(_, allLayouts) => {
-          setLayouts(allLayouts);
-          persistLayout(allLayouts);
+          const nextLayouts = allLayouts as DashboardLayouts;
+          setLayouts(nextLayouts);
+          persistLayout(nextLayouts);
         }}
       >
         {Object.keys(widgetById).map((id) => {
@@ -186,9 +217,12 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
                         movable and resizable, and its position is saved to your
                         account.
                       </p>
-                      <Button asChild variant="secondary" size="sm">
-                        <Link href={widget.href}>Open module</Link>
-                      </Button>
+                      <Link
+                        href={widget.href}
+                        className={buttonVariants({ variant: "secondary", size: "sm" })}
+                      >
+                        Open module
+                      </Link>
                     </>
                   ) : null}
                 </CardContent>
@@ -196,7 +230,7 @@ export function DashboardGrid({ initialLayouts }: DashboardGridProps) {
             </div>
           );
         })}
-      </ResponsiveGridLayout>
+      </Responsive>
     </section>
   );
 }

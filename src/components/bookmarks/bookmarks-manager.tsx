@@ -257,10 +257,14 @@ export function BookmarksManager() {
                     <p className="truncate text-xs text-muted-foreground">{bookmark.url}</p>
                   </a>
                   <div className="flex items-center gap-1">
-                    <Button type="button" size="icon-xs" variant="ghost" asChild>
-                      <a href={bookmark.url} target="_blank" rel="noopener noreferrer" aria-label="Open bookmark">
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
+                    <Button
+                      type="button"
+                      size="icon-xs"
+                      variant="ghost"
+                      onClick={() => window.open(bookmark.url, "_blank", "noopener,noreferrer")}
+                      aria-label="Open bookmark"
+                    >
+                      <ExternalLink className="h-4 w-4" />
                     </Button>
                     <Button
                       type="button"

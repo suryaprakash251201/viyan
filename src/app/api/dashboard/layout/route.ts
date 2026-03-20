@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isValidDashboardLayouts } from "@/lib/dashboard-layout";
@@ -18,14 +19,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid layout payload" }, { status: 400 });
   }
 
+  const layoutJson = layout as unknown as Prisma.InputJsonValue;
+
   await prisma.dashboardLayout.upsert({
     where: { userId },
     create: {
       userId,
-      layout,
+      layout: layoutJson,
     },
     update: {
-      layout,
+      layout: layoutJson,
     },
   });
 

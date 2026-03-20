@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -74,10 +75,13 @@ export async function POST(request: Request) {
     | null;
 
   const title = payload?.title?.trim() || "Untitled note";
-  const content = payload?.content ?? {
-    type: "doc",
-    content: [{ type: "paragraph" }],
-  };
+  const content =
+    payload?.content === null
+      ? Prisma.JsonNull
+      : ((payload?.content ?? {
+          type: "doc",
+          content: [{ type: "paragraph" }],
+        }) as Prisma.InputJsonValue);
   const tags = normalizeTags(payload?.tags);
   const pinned = payload?.pinned === true;
 

@@ -21,8 +21,10 @@ export default async function DashboardPage() {
     },
   });
 
-  const initialLayouts = isValidDashboardLayouts(savedLayout?.layout)
-    ? savedLayout.layout
+  const persistedLayout = savedLayout?.layout;
+
+  const initialLayouts = persistedLayout && isValidDashboardLayouts(persistedLayout)
+    ? persistedLayout
     : DEFAULT_DASHBOARD_LAYOUTS;
 
   return (
