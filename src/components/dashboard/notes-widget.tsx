@@ -23,7 +23,8 @@ export function NotesWidget({ pinnedOnly = false }: NotesWidgetProps) {
   useEffect(() => {
     const loadNotes = async () => {
       try {
-        const response = await fetch("/api/notes?limit=10", { cache: "no-store" });
+        const endpoint = pinnedOnly ? "/api/notes?pinned=true&limit=20" : "/api/notes?limit=10";
+        const response = await fetch(endpoint, { cache: "no-store" });
         if (!response.ok) throw new Error("Failed to load notes");
         const payload = (await response.json()) as { notes: NoteItem[] };
         setNotes(payload.notes);
@@ -34,7 +35,7 @@ export function NotesWidget({ pinnedOnly = false }: NotesWidgetProps) {
       }
     };
     void loadNotes();
-  }, []);
+  }, [pinnedOnly]);
 
   const filteredNotes = useMemo(() => {
     const base = pinnedOnly ? notes.filter((note) => note.pinned) : notes;

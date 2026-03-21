@@ -17,6 +17,7 @@ export async function POST() {
   await prisma.$transaction([
     prisma.dashboardLayout.deleteMany({ where: { userId } }),
     prisma.note.deleteMany({ where: { userId } }),
+    prisma.todo.deleteMany({ where: { userId } }),
     prisma.transaction.deleteMany({ where: { userId } }),
     prisma.budgetLimit.deleteMany({ where: { userId } }),
     prisma.bookmark.deleteMany({ where: { userId } }),

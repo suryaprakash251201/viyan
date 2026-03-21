@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   BookOpen,
-  ChevronDown,
+  Bot,
   ChevronLeft,
   ChevronRight,
   Compass,
   LayoutDashboard,
   Landmark,
-  List,
+  ListTodo,
   Moon,
   Settings,
   Sparkles,
@@ -23,44 +23,27 @@ import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/finance", label: "Finance", icon: Landmark },
   { href: "/notes", label: "Notes", icon: BookOpen },
   { href: "/bookmarks", label: "Bookmarks", icon: Compass },
+  { href: "/todos", label: "Todos", icon: ListTodo },
+  { href: "/chat", label: "AI Chat", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-const WIDGET_MENU_ITEMS = [
-  { id: "calendar", label: "Calendar" },
-  { id: "tasks", label: "Tasks" },
-  { id: "notes", label: "Notes" },
-  { id: "finance", label: "Finance" },
-  { id: "bookmarks", label: "Bookmarks" },
-];
-
 interface AppSidebarProps {
-  visibleWidgets?: string[];
-  onToggleWidget?: (id: string) => void;
   isMobile?: boolean;
 }
 
-function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile = false }: AppSidebarProps) {
+function AppSidebar({ isMobile = false }: AppSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
   const dark = resolvedTheme === "dark";
   const [collapsed, setCollapsed] = useState(false);
-  const [widgetsOpen, setWidgetsOpen] = useState(true);
 
   return (
     <aside
@@ -132,93 +115,7 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
           );
         })}
 
-        {/* Divider */}
         <div className="my-4 h-px bg-sidebar-border/80" />
-
-        {/* Widgets 3-dot menu section */}
-        <div className={collapsed ? "px-1" : ""}>
-          {!collapsed && (
-            <button
-              type="button"
-              onClick={() => setWidgetsOpen(!widgetsOpen)}
-              className="flex w-full items-center justify-between px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                <List className="h-3.5 w-3.5" />
-                Widgets
-              </span>
-              <ChevronDown
-                className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                  widgetsOpen ? "rotate-0" : "-rotate-90"
-                }`}
-              />
-            </button>
-          )}
-
-          {widgetsOpen && !collapsed && (
-            <div className="mt-1 space-y-0.5">
-              {WIDGET_MENU_ITEMS.map((widget) => {
-                const isVisible = visibleWidgets.includes(widget.id);
-                return (
-                  <button
-                    key={widget.id}
-                    type="button"
-                    onClick={() => onToggleWidget(widget.id)}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm transition-colors ${
-                      isVisible
-                        ? "text-foreground bg-muted"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                    }`}
-                  >
-                    <div
-                      className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                        isVisible ? "bg-primary" : "bg-border"
-                      }`}
-                    />
-                    <span>{widget.label}</span>
-                    {isVisible && (
-                      <span className="ml-auto text-[10px] font-medium text-primary">
-                        Visible
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {/* 3-dot menu for widgets (collapsed state) */}
-          {collapsed && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex w-full items-center justify-center py-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted/30">
-                <List className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Toggle Widgets
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {WIDGET_MENU_ITEMS.map((widget) => {
-                  const isVisible = visibleWidgets.includes(widget.id);
-                  return (
-                    <DropdownMenuItem
-                      key={widget.id}
-                      onClick={() => onToggleWidget(widget.id)}
-                      className="flex items-center justify-between gap-2 cursor-pointer"
-                    >
-                      <span>{widget.label}</span>
-                      <div
-                        className={`h-2 w-2 rounded-full ${
-                          isVisible ? "bg-primary" : "bg-muted"
-                        }`}
-                      />
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
       </nav>
 
       {/* Bottom: theme + user */}

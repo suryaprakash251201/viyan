@@ -40,6 +40,10 @@ function TopNav({ mobileSidebar }: TopNavProps) {
         ? "Notes"
         : pathname.startsWith("/bookmarks")
           ? "Bookmarks"
+          : pathname.startsWith("/todos")
+            ? "Todos"
+            : pathname.startsWith("/chat")
+              ? "AI Chat"
           : pathname.startsWith("/settings")
             ? "Settings"
             : "Dashboard";

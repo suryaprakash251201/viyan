@@ -4,9 +4,11 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
+  Bot,
   Compass,
   LayoutDashboard,
   Landmark,
+  ListTodo,
   Moon,
   Settings,
   Sun,
@@ -81,6 +83,18 @@ export function CommandMenu() {
           >
             <Compass className="mr-2 h-4 w-4" />
             <span>Bookmarks</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push("/todos"))}
+          >
+            <ListTodo className="mr-2 h-4 w-4" />
+            <span>Todos</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push("/chat"))}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            <span>AI Chat</span>
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />

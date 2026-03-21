@@ -5,11 +5,13 @@ Self-hosted personal dashboard built with Next.js App Router, Prisma, PostgreSQL
 ## Features
 
 - OAuth login with Google and protected app routes
-- Drag-and-drop dashboard layout persisted per user
+- Curated workspace widgets with pinned notes and bookmarks
 - Google Calendar and Google Tasks widgets
 - Notes module with rich text editor (TipTap)
 - Finance tracker with KPIs, charts, budgets, and CSV import
 - Bookmarks manager grouped by category
+- Todo manager with priorities, due dates, and completion tracking
+- AI chat assistant using Gemini or OpenRouter with app context tools
 - Settings for theme, currency, timezone, and data reset
 
 ## Tech Stack

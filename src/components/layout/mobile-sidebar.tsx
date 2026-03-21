@@ -6,12 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AppSidebar } from "./app-sidebar";
 import { useState } from "react";
 
-interface MobileSidebarProps {
-  visibleWidgets?: string[];
-  onToggleWidget?: (id: string) => void;
-}
-
-export function MobileSidebar({ visibleWidgets = [], onToggleWidget = () => {} }: MobileSidebarProps) {
+export function MobileSidebar() {
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,14 +26,7 @@ export function MobileSidebar({ visibleWidgets = [], onToggleWidget = () => {} }
           <SheetTitle>Navigation Menu</SheetTitle>
         </SheetHeader>
         <div className="h-full bg-card overflow-y-auto">
-          <AppSidebar 
-            visibleWidgets={visibleWidgets} 
-            onToggleWidget={(id) => {
-              onToggleWidget(id);
-              // We don't necessarily want to close the sidebar when toggling a widget
-            }}
-            isMobile
-          />
+          <AppSidebar isMobile />
         </div>
       </SheetContent>
     </Sheet>
