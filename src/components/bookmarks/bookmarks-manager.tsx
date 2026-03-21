@@ -258,20 +258,12 @@ export function BookmarksManager() {
   return (
     <section className="flex w-full flex-col gap-5">
       <header className="finance-shell overflow-hidden p-5 md:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Quick Links
-            </p>
-            <h1 className="text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">
-              Your personal launchpad
-            </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground">
-              Keep your most-used destinations grouped, branded, and one click away with automatic favicons.
-            </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5">Bookmarks</span>
+            <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5">Quick Links</span>
           </div>
-
-          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-wrap gap-2">
             <div className="rounded-full border border-border/60 bg-background/70 px-3 py-1.5">
               {bookmarkCount} bookmarks
             </div>

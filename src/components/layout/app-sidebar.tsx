@@ -74,7 +74,7 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border/80 px-4">
         {!collapsed ? (
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <span className="text-[33px] leading-none font-extrabold tracking-tight">OFSPACE.CO</span>
+            <span className="text-[33px] leading-none font-extrabold tracking-tight">Viyan</span>
           </Link>
         ) : (
           <Link href="/dashboard" className="mx-auto">

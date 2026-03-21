@@ -46,10 +46,10 @@ function TopNav({ mobileSidebar }: TopNavProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90">
-      <div className="mx-auto flex h-[70px] max-w-[1300px] items-center justify-between gap-4 px-5 md:px-6">
+      <div className="mx-auto flex h-16 max-w-[1300px] items-center justify-between gap-4 px-5 md:px-6">
         <div className="flex items-center gap-3">
           {mobileSidebar}
-          <h1 className="text-[40px] leading-none font-semibold tracking-tight md:text-[42px]">{pageTitle}</h1>
+          <h1 className="text-[34px] leading-none font-semibold tracking-tight md:text-[36px]">{pageTitle}</h1>
         </div>
 
         {/* Right Actions */}

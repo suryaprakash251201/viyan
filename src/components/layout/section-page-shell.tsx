@@ -27,7 +27,7 @@ export function SectionPageShell({ title, description, children }: SectionPageSh
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    OFSPACE.CO
+                    Viyan
                   </p>
                   <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[44px] md:leading-none">
                     {title}

@@ -260,8 +260,14 @@ export function NotesManager() {
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<"all" | "pinned">("all");
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+
+  const visibleNotes = useMemo(
+    () => (view === "pinned" ? notes.filter((note) => note.pinned) : notes),
+    [notes, view]
+  );
 
   const selectedNote = useMemo(
     () => notes.find((note) => note.id === selectedNoteId) ?? null,
@@ -337,11 +343,22 @@ export function NotesManager() {
   return (
     <section className="flex w-full flex-col gap-4">
       <header className="finance-shell flex flex-wrap items-center justify-between gap-3 p-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Notes Module
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">Rich text notes, tags, and pinning</h1>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5">Notes Module</span>
+          <button
+            type="button"
+            onClick={() => setView("all")}
+            className={`rounded-full border px-3 py-1.5 ${view === "all" ? "border-foreground bg-foreground text-background" : "border-border/70 bg-background/80"}`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("pinned")}
+            className={`rounded-full border px-3 py-1.5 ${view === "pinned" ? "border-foreground bg-foreground text-background" : "border-border/70 bg-background/80"}`}
+          >
+            Pinned
+          </button>
         </div>
         <div className="flex w-full max-w-xl flex-1 items-center gap-2">
           <div className="relative w-full">
@@ -369,20 +386,20 @@ export function NotesManager() {
         </div>
       ) : null}
 
-      {!loading && notes.length === 0 ? (
+      {!loading && visibleNotes.length === 0 ? (
         <Card>
           <CardContent className="py-8">
             <EmptyState
               icon={Search}
-              title="No notes found"
-              description="Create your first note to get started."
+              title={view === "pinned" ? "No pinned notes" : "No notes found"}
+              description={view === "pinned" ? "Pin notes to access them quickly here." : "Create your first note to get started."}
             />
           </CardContent>
         </Card>
       ) : null}
 
       <div className="columns-1 gap-4 md:columns-2 xl:columns-3">
-        {notes.map((note) => {
+        {visibleNotes.map((note) => {
           const preview = extractPlainText(note.content).trim() || "Empty note";
 
           return (

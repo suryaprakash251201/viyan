@@ -323,11 +323,9 @@ export function FinanceTracker() {
   return (
     <section className="flex w-full flex-col gap-4">
       <header className="finance-shell flex flex-wrap items-center justify-between gap-3 p-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Finance Tracker
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">Income, expenses, budgets, and trends</h1>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5">Finance Tracker</span>
+          <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5">INR</span>
         </div>
         <Input
           type="month"
