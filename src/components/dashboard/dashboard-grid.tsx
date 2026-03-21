@@ -64,7 +64,7 @@ const WIDGETS: WidgetMeta[] = [
     description: "Your upcoming schedule at a glance.",
     icon: CalendarClock,
     href: "/dashboard",
-    tone: "from-sky-500/15 via-transparent to-transparent",
+    tone: "from-sky-500/8 via-transparent to-transparent",
     iconTone: "text-sky-500 dark:text-sky-400",
     accent: "bg-sky-500/10 border-sky-500/20 text-sky-600 dark:text-sky-400",
   },
@@ -74,7 +74,7 @@ const WIDGETS: WidgetMeta[] = [
     description: "Stay on top of your to-dos.",
     icon: CheckCircle2,
     href: "/dashboard",
-    tone: "from-emerald-500/15 via-transparent to-transparent",
+    tone: "from-emerald-500/8 via-transparent to-transparent",
     iconTone: "text-emerald-500 dark:text-emerald-400",
     accent: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
   },
@@ -84,7 +84,7 @@ const WIDGETS: WidgetMeta[] = [
     description: "Quick access to your notes.",
     icon: NotebookPen,
     href: "/notes",
-    tone: "from-amber-500/15 via-transparent to-transparent",
+    tone: "from-amber-500/8 via-transparent to-transparent",
     iconTone: "text-amber-500 dark:text-amber-400",
     accent: "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400",
   },
@@ -94,7 +94,7 @@ const WIDGETS: WidgetMeta[] = [
     description: "Track spending and budgets.",
     icon: Landmark,
     href: "/finance",
-    tone: "from-fuchsia-500/15 via-transparent to-transparent",
+    tone: "from-fuchsia-500/8 via-transparent to-transparent",
     iconTone: "text-fuchsia-500 dark:text-fuchsia-400",
     accent: "bg-fuchsia-500/10 border-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400",
   },
@@ -104,7 +104,7 @@ const WIDGETS: WidgetMeta[] = [
     description: "Your most-used links, one click away.",
     icon: Bookmark,
     href: "/bookmarks",
-    tone: "from-indigo-500/15 via-transparent to-transparent",
+    tone: "from-indigo-500/8 via-transparent to-transparent",
     iconTone: "text-indigo-500 dark:text-indigo-400",
     accent: "bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-indigo-400",
   },
@@ -227,15 +227,15 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
   };
 
   return (
-    <Card className="dashboard-widget group relative h-full overflow-hidden border-border/60 bg-card/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+    <Card className="dashboard-widget group relative h-full overflow-hidden border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
       {/* Top gradient overlay */}
-      <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${widget.tone}`} />
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b ${widget.tone}`} />
 
       {/* Header */}
-      <CardHeader className="relative pb-2">
+      <CardHeader className="relative pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-2xl border border-border/80 bg-card shadow-sm ${widget.accent}`}>
+            <div className={`flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-background ${widget.accent}`}>
               <Icon className="h-5 w-5" />
             </div>
             <div>
@@ -245,7 +245,7 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
           </div>
 
           {/* Widget actions */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-70 transition-opacity group-hover:opacity-100">
             <Button
               type="button"
               variant="ghost"
@@ -294,7 +294,7 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
         )}
       </CardHeader>
 
-      <CardContent className="relative flex flex-col gap-3">
+      <CardContent className="relative flex flex-col gap-3 pt-0">
         {children}
       </CardContent>
     </Card>
@@ -577,7 +577,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
             </div>
 
             <Responsive
-              className="layout min-w-0"
+              className="layout dashboard-widget-grid min-w-0"
               breakpoints={DASHBOARD_BREAKPOINTS}
               cols={DASHBOARD_COLS}
               layouts={layouts}
@@ -632,7 +632,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
                 };
 
                 return (
-                  <div key={id} className="min-w-0 pb-1">
+                  <div key={id} className="min-w-0 pb-2">
                     <WidgetCard widget={widget}>
                       <ErrorBoundary>{renderWidget()}</ErrorBoundary>
                     </WidgetCard>
