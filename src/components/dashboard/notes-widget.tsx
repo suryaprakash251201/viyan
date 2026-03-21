@@ -11,7 +11,11 @@ interface NoteItem {
   updatedAt: string;
 }
 
-export function NotesWidget() {
+interface NotesWidgetProps {
+  pinnedOnly?: boolean;
+}
+
+export function NotesWidget({ pinnedOnly = false }: NotesWidgetProps) {
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,12 +37,14 @@ export function NotesWidget() {
   }, []);
 
   const filteredNotes = useMemo(() => {
-    return notes
+    const base = pinnedOnly ? notes.filter((note) => note.pinned) : notes;
+
+    return base
       .filter((note) =>
         note.title.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .slice(0, 5);
-  }, [notes, searchTerm]);
+  }, [notes, pinnedOnly, searchTerm]);
 
   if (loading) {
     return <WidgetSkeleton />;
@@ -60,8 +66,8 @@ export function NotesWidget() {
         {filteredNotes.length === 0 ? (
           <EmptyState
             icon={NotebookPen}
-            title={searchTerm ? "No results" : "No notes"}
-            description={searchTerm ? `No notes matching "${searchTerm}"` : "Create your first note"}
+            title={searchTerm ? "No results" : pinnedOnly ? "No pinned notes" : "No notes"}
+            description={searchTerm ? `No notes matching "${searchTerm}"` : pinnedOnly ? "Pin notes to show them here" : "Create your first note"}
             action={!searchTerm ? {
               label: "Create Note",
               onClick: () => window.location.href = "/notes",
