@@ -179,7 +179,7 @@ export function CalendarWidget() {
       </div>
 
       {/* Events list */}
-      <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60">
+      <div className="widget-surface flex-1 overflow-auto">
         {needsReauth ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <CalendarX className="h-8 w-8 text-muted-foreground/50" />
@@ -195,11 +195,11 @@ export function CalendarWidget() {
         ) : (
           <div className="space-y-1 p-2">
             {/* Summary bar */}
-            <div className="flex items-center justify-between rounded-lg bg-card px-3 py-2 mb-2 border border-border/40">
+            <div className="widget-row mb-2 flex items-center justify-between px-3 py-2">
               <div className="flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5 text-primary" />
                 <span className="text-xs font-semibold">
-                  {todayCount > 0 ? `${todayCount} Today` : "No events today"}
+                  {todayCount > 0 ? `${todayCount} Today` : "No events today"} · {upcomingCount} upcoming
                 </span>
               </div>
               <a
@@ -229,7 +229,7 @@ export function CalendarWidget() {
                 return (
                   <div
                     key={event.id}
-                    className={`group flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all hover:bg-muted/30 ${color.bg} ${color.border}`}
+                    className={`group flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all hover:bg-muted/30 ${color.bg} ${color.border}`}
                   >
                     {/* Time sidebar */}
                     <div className="flex flex-col items-center gap-0.5 min-w-[40px] border-r border-border/40 pr-2">

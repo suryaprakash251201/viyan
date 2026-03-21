@@ -56,7 +56,7 @@ export function NotesWidget() {
         />
       </div>
 
-      <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60 p-2">
+      <div className="widget-surface flex-1 overflow-auto p-2">
         {filteredNotes.length === 0 ? (
           <EmptyState
             icon={NotebookPen}
@@ -72,7 +72,7 @@ export function NotesWidget() {
             {filteredNotes.map((note) => (
               <li
                 key={note.id}
-                className="group flex items-center gap-2 rounded-lg border border-border/40 bg-card px-3 py-2 transition-all hover:border-border/80 hover:bg-accent/50"
+                className="widget-row group flex items-center gap-2 px-3 py-2 transition-all hover:border-border/100 hover:bg-accent/40"
               >
                 <NotebookPen className="h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden="true" />
                 <span className="min-w-0 flex-1 truncate text-xs font-medium">{note.title}</span>

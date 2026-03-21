@@ -227,6 +227,18 @@
   z-index: 12;
 }
 
+.widget-surface {
+  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
+  background: color-mix(in oklch, var(--background) 92%, var(--card));
+  border-radius: 0.875rem;
+}
+
+.widget-row {
+  border: 1px solid color-mix(in oklch, var(--border) 82%, transparent);
+  background: color-mix(in oklch, var(--card) 94%, transparent);
+  border-radius: 0.75rem;
+}
+
 .theme-energize {
   --background: oklch(0.985 0.01 88);
   --card: oklch(0.995 0.005 88);

@@ -267,7 +267,7 @@ export function TasksWidget() {
   return (
     <div className="flex h-full flex-col gap-3">
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-background/60 p-3">
+      <div className="widget-surface grid grid-cols-3 gap-2 p-3">
         <div className="flex flex-col items-center gap-1">
           <div className="flex items-center gap-1.5">
             <Circle className="h-3.5 w-3.5 text-primary" />
@@ -301,7 +301,7 @@ export function TasksWidget() {
       <Progress value={stats.progress} className="h-1.5 rounded-full" />
 
       {/* Task lists */}
-      <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60 p-2 space-y-2">
+      <div className="widget-surface flex-1 overflow-auto p-2 space-y-2">
         {loading ? (
           <WidgetSkeleton />
         ) : needsReauth ? (
@@ -325,7 +325,7 @@ export function TasksWidget() {
             return (
               <div
                 key={list.id}
-                className="rounded-xl border border-border/60 bg-card p-3 space-y-2"
+                className="widget-row p-3 space-y-2"
               >
                 {/* List header */}
                 <div className="flex items-center justify-between">

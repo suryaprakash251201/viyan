@@ -80,21 +80,21 @@ export function FinanceWidget() {
     <div className="flex h-full flex-col gap-3">
       {/* Summary grid */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="flex flex-col items-center gap-1 rounded-xl border border-border/60 bg-background/60 p-2.5">
+        <div className="widget-surface flex flex-col items-center gap-1 p-2.5">
           <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
           <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
             {formatINR(totalIncome)}
           </span>
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Income</span>
         </div>
-        <div className="flex flex-col items-center gap-1 rounded-xl border border-border/60 bg-background/60 p-2.5">
+        <div className="widget-surface flex flex-col items-center gap-1 p-2.5">
           <TrendingDown className="h-3.5 w-3.5 text-rose-500" />
           <span className="text-sm font-bold text-rose-600 dark:text-rose-400">
             {formatINR(totalExpenses)}
           </span>
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Expenses</span>
         </div>
-        <div className="flex flex-col items-center gap-1 rounded-xl border border-primary/20 bg-primary/5 p-2.5">
+        <div className="widget-surface flex flex-col items-center gap-1 border-primary/20 bg-primary/5 p-2.5">
           <Wallet className="h-3.5 w-3.5 text-primary" />
           <span className="text-sm font-bold text-primary">
             {formatINR(savings)}
@@ -119,7 +119,7 @@ export function FinanceWidget() {
       </div>
 
       {/* Recent transactions */}
-      <div className="flex-1 overflow-auto rounded-xl border border-border/60 bg-background/60 p-2">
+      <div className="widget-surface flex-1 overflow-auto p-2">
         <div className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
           Recent Activity
         </div>
@@ -127,7 +127,7 @@ export function FinanceWidget() {
           {recentTransactions.map((t) => (
             <li
               key={t.id}
-              className="group flex items-center gap-2 rounded-lg border border-border/40 bg-card px-2 py-1.5 transition-all hover:border-border/80"
+              className="widget-row group flex items-center gap-2 px-2 py-1.5 transition-all hover:border-border/100"
             >
               <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                 t.type === "INCOME" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"

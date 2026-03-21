@@ -1,5 +1,6 @@
 "use client";
 
+import Image, { type ImageLoaderProps } from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Pencil, Trash2, Bookmark } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +25,8 @@ const DEFAULT_CATEGORIES = ["Dev Tools", "Social", "Self-hosted Services", "Misc
 function isFaviconUrl(value: string | null): boolean {
   return Boolean(value && /^https?:\/\//i.test(value));
 }
+
+const passthroughImageLoader = ({ src }: ImageLoaderProps) => src;
 
 function BookmarkEditor({
   bookmark,
@@ -100,7 +103,15 @@ function BookmarkEditor({
             <div className="flex gap-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40">
                 {isFaviconUrl(icon) ? (
-                  <img src={icon} alt="" className="h-5 w-5 rounded-sm" />
+                  <Image
+                    loader={passthroughImageLoader}
+                    unoptimized
+                    src={icon ?? ""}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 rounded-sm"
+                  />
                 ) : icon ? (
                   <span className="text-lg">{icon}</span>
                 ) : (
@@ -309,7 +320,15 @@ export function BookmarksManager() {
             <div className="flex gap-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40">
                 {isFaviconUrl(icon) ? (
-                  <img src={icon} alt="" className="h-5 w-5 rounded-sm" />
+                  <Image
+                    loader={passthroughImageLoader}
+                    unoptimized
+                    src={icon}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 rounded-sm"
+                  />
                 ) : icon ? (
                   <span className="text-lg">{icon}</span>
                 ) : (
@@ -400,12 +419,14 @@ export function BookmarksManager() {
                     <div className="flex items-center gap-2">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-sm">
                         {isFaviconUrl(bookmark.icon) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
+                            loader={passthroughImageLoader}
+                            unoptimized
                             src={bookmark.icon ?? ""}
                             alt=""
+                            width={16}
+                            height={16}
                             className="h-4 w-4 rounded-sm"
-                            loading="lazy"
                           />
                         ) : bookmark.icon ? (
                           <span>{bookmark.icon}</span>

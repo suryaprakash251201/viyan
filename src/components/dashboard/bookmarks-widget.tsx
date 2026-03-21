@@ -1,5 +1,6 @@
 "use client";
 
+import Image, { type ImageLoaderProps } from "next/image";
 import { useEffect, useState } from "react";
 import { Bookmark, ExternalLink } from "lucide-react";
 import { BookmarkSkeleton } from "@/components/ui/skeleton";
@@ -16,6 +17,8 @@ interface BookmarkItem {
 function isFaviconUrl(value: string | null | undefined): boolean {
   return Boolean(value && /^https?:\/\//i.test(value));
 }
+
+const passthroughImageLoader = ({ src }: ImageLoaderProps) => src;
 
 export function BookmarksWidget() {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
@@ -86,16 +89,19 @@ export function BookmarksWidget() {
                   href={bookmark.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/80 px-3 py-2 text-xs transition-colors hover:bg-muted/30"
+                  className="widget-row flex items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-muted/30"
                   aria-label={`${bookmark.label} - opens in new tab`}
                 >
                   <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border/70 bg-muted/20 text-[10px]">
                     {isFaviconUrl(bookmark.icon) ? (
-                      <img
+                      <Image
+                        loader={passthroughImageLoader}
+                        unoptimized
                         src={bookmark.icon ?? ""}
                         alt=""
+                        width={14}
+                        height={14}
                         className="h-3.5 w-3.5 rounded-sm"
-                        loading="lazy"
                       />
                     ) : bookmark.icon ? (
                       <span>{bookmark.icon}</span>
