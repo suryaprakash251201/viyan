@@ -5,7 +5,7 @@ export default function SettingsPage() {
   return (
     <SectionPageShell
       title="Settings"
-      description="Tune appearance, localization, and account controls."
+      description="Manage theme, localization, integrations, and account controls."
     >
       <SettingsManager />
     </SectionPageShell>

@@ -4,8 +4,8 @@ import { SectionPageShell } from "@/components/layout/section-page-shell";
 export default function FinancePage() {
   return (
     <SectionPageShell
-      title="Finance Tracker"
-      description="Income, expenses, budgets, and trends in one place."
+      title="Finance"
+      description="Track income, expenses, budgets, and trends with INR-first analytics."
     >
       <FinanceTracker />
     </SectionPageShell>

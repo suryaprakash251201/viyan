@@ -2,13 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Bell,
-  BookOpen,
-  Compass,
-  LayoutDashboard,
-  Landmark,
   Mail,
   Search,
   Settings,
@@ -16,7 +11,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,20 +22,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 
-const NAV_LINKS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/finance", label: "Finance", icon: Landmark },
-  { href: "/notes", label: "Notes", icon: BookOpen },
-  { href: "/bookmarks", label: "Bookmarks", icon: Compass },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
-
 interface TopNavProps {
   mobileSidebar?: React.ReactNode;
 }
 
 function TopNav({ mobileSidebar }: TopNavProps) {
-  const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
   const dark = resolvedTheme === "dark";
@@ -52,28 +38,6 @@ function TopNav({ mobileSidebar }: TopNavProps) {
           {mobileSidebar}
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         </div>
-
-        {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            const active = pathname === link.href || pathname.startsWith(link.href + "/");
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={buttonVariants({
-                  variant: active ? "secondary" : "ghost",
-                  size: "sm",
-                  className: `gap-2 ${active ? "bg-primary/10 text-primary" : "text-muted-foreground"}`,
-                })}
-              >
-                <Icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
@@ -167,28 +131,6 @@ function TopNav({ mobileSidebar }: TopNavProps) {
         </div>
       </div>
 
-      {/* Mobile Nav - only show if no mobileSidebar (fallback) */}
-      {!mobileSidebar && (
-        <div className="flex md:hidden items-center justify-between px-4 pb-2 gap-1 overflow-x-auto">
-          {NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            const active = pathname === link.href || pathname.startsWith(link.href + "/");
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={buttonVariants({
-                  variant: active ? "secondary" : "ghost",
-                  size: "icon-xs",
-                  className: active ? "bg-primary/10 text-primary" : "text-muted-foreground",
-                })}
-              >
-                <Icon className="h-4 w-4" />
-              </Link>
-            );
-          })}
-        </div>
-      )}
     </header>
   );
 }

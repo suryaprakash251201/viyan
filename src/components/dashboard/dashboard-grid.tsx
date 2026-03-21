@@ -110,26 +110,41 @@ const WIDGETS: WidgetMeta[] = [
   },
 ];
 
-const FINANCE_STATS = [
-  { label: "Balance", amount: "$ 32,900", growth: "3.5% this month", className: "finance-stat-a" },
-  { label: "Spending", amount: "$ 8,430", growth: "74% from budget", className: "finance-stat-b" },
-  { label: "Investment", amount: "$ 23,900", growth: "12.5% return", className: "finance-stat-c" },
-];
+type TransactionType = "INCOME" | "EXPENSE";
+type TransactionCategory =
+  | "FOOD"
+  | "RENT"
+  | "TRANSPORT"
+  | "SAAS_SUBSCRIPTIONS"
+  | "SALARY"
+  | "FREELANCE"
+  | "MISC";
 
-const SPENDING_CARDS = [
-  { name: "Home Rent", amount: "$1200" },
-  { name: "Mobile Bill", amount: "$120" },
-  { name: "Electric Bill", amount: "$220" },
-  { name: "Internet", amount: "$89" },
-  { name: "Fuel", amount: "$260" },
-];
+interface FinanceTransaction {
+  id: string;
+  amount: number;
+  type: TransactionType;
+  category: TransactionCategory;
+  date: string;
+  note: string | null;
+}
 
-const TRANSACTIONS = [
-  { name: "Royal Arkin", status: "In progress", date: "22 Jan, 2026", amount: "$12,334" },
-  { name: "Saimon Tanvir", status: "Completed", date: "28 Dec, 2025", amount: "$20,334" },
-  { name: "Washi Bin", status: "Completed", date: "12 Dec, 2025", amount: "$42,334" },
-  { name: "Zulia Andre", status: "Completed", date: "12 Dec, 2025", amount: "$42,334" },
-];
+const CATEGORY_LABELS: Record<TransactionCategory, string> = {
+  FOOD: "Food",
+  RENT: "Rent",
+  TRANSPORT: "Transport",
+  SAAS_SUBSCRIPTIONS: "SaaS",
+  SALARY: "Salary",
+  FREELANCE: "Freelance",
+  MISC: "Misc",
+};
+
+function formatINR(value: number): string {
+  return `₹${value.toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  })}`;
+}
 
 const QUICK_SEND = ["AD", "DD", "WS", "SP", "RM"];
 
@@ -145,10 +160,12 @@ function getGreeting(now: Date): string {
 function DashboardHero({
   now,
   userName,
+  financeStats,
   onResetLayout,
 }: {
   now: Date | null;
   userName: string;
+  financeStats: Array<{ label: string; amount: string; growth: string; className: string }>;
   onResetLayout: () => void;
 }) {
   const greeting = now ? getGreeting(now) : "Welcome back";
@@ -180,7 +197,7 @@ function DashboardHero({
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          {FINANCE_STATS.map((card) => (
+          {financeStats.map((card) => (
             <div key={card.label} className={`finance-soft-card ${card.className} p-4`}>
               <p className="text-sm text-muted-foreground">{card.label}</p>
               <p className="mt-1 text-2xl font-semibold tracking-tight">{card.amount}</p>
@@ -289,10 +306,107 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
   const [now, setNow] = useState<Date | null>(null);
+  const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
+  const [financeLoading, setFinanceLoading] = useState(true);
 
   useEffect(() => {
     setNow(new Date());
   }, []);
+
+  const currentMonth = useMemo(() => format(now ?? new Date(), "yyyy-MM"), [now]);
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      setFinanceLoading(true);
+      try {
+        const response = await fetch(`/api/finance/transactions?month=${currentMonth}`, {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load finance transactions");
+        }
+
+        const payload = (await response.json()) as { transactions: FinanceTransaction[] };
+        setTransactions(payload.transactions);
+      } catch {
+        toast.error("Could not load finance activity");
+      } finally {
+        setFinanceLoading(false);
+      }
+    };
+
+    void loadTransactions();
+  }, [currentMonth]);
+
+  const financeSummary = useMemo(() => {
+    const income = transactions
+      .filter((transaction) => transaction.type === "INCOME")
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
+    const expense = transactions
+      .filter((transaction) => transaction.type === "EXPENSE")
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
+    const balance = income - expense;
+    const savingsRate = income > 0 ? ((balance / income) * 100) : 0;
+    return { income, expense, balance, savingsRate };
+  }, [transactions]);
+
+  const financeStats = useMemo(
+    () => [
+      {
+        label: "Balance",
+        amount: formatINR(financeSummary.balance),
+        growth: `${financeSummary.savingsRate.toFixed(1)}% savings rate`,
+        className: "finance-stat-a",
+      },
+      {
+        label: "Spending",
+        amount: formatINR(financeSummary.expense),
+        growth: `${transactions.filter((transaction) => transaction.type === "EXPENSE").length} expense entries`,
+        className: "finance-stat-b",
+      },
+      {
+        label: "Income",
+        amount: formatINR(financeSummary.income),
+        growth: `${transactions.filter((transaction) => transaction.type === "INCOME").length} income entries`,
+        className: "finance-stat-c",
+      },
+    ],
+    [financeSummary, transactions]
+  );
+
+  const spendByCategory = useMemo(() => {
+    const map = new Map<TransactionCategory, number>();
+
+    for (const transaction of transactions) {
+      if (transaction.type !== "EXPENSE") continue;
+      map.set(transaction.category, (map.get(transaction.category) ?? 0) + transaction.amount);
+    }
+
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([category, amount], index) => ({
+        name: CATEGORY_LABELS[category],
+        amount,
+        className:
+          index % 3 === 0
+            ? "finance-soft-card finance-stat-a p-3"
+            : index % 3 === 1
+              ? "finance-soft-card finance-stat-b p-3"
+              : "finance-soft-card finance-stat-c p-3",
+      }));
+  }, [transactions]);
+
+  const recentTransactions = useMemo(
+    () => [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 4),
+    [transactions]
+  );
+
+  const recentActivity = useMemo(
+    () => [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 3),
+    [transactions]
+  );
 
   const [layouts, setLayouts] = useState<DashboardLayouts>(
     Object.keys(initialLayouts).length > 0
@@ -366,6 +480,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
       <DashboardHero
         now={now}
         userName={session?.user?.name ?? "there"}
+        financeStats={financeStats}
         onResetLayout={resetLayout}
       />
 
@@ -374,21 +489,25 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
           <div className="finance-shell p-4 md:p-5">
             <h3 className="text-2xl font-semibold tracking-tight">Spending</h3>
             <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
-              {SPENDING_CARDS.map((item, index) => (
-                <div
-                  key={item.name}
-                  className={
-                    index % 3 === 0
-                      ? "finance-soft-card finance-stat-a p-3"
-                      : index % 3 === 1
-                        ? "finance-soft-card finance-stat-b p-3"
-                        : "finance-soft-card finance-stat-c p-3"
-                  }
-                >
-                  <p className="text-xs text-muted-foreground">{item.name}</p>
-                  <p className="mt-1 text-lg font-semibold">{item.amount}</p>
-                </div>
-              ))}
+              {financeLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="finance-soft-card bg-muted/60 p-3">
+                    <p className="h-4 w-20 rounded bg-muted" />
+                    <p className="mt-2 h-5 w-24 rounded bg-muted" />
+                  </div>
+                ))
+              ) : spendByCategory.length > 0 ? (
+                spendByCategory.map((item) => (
+                  <div key={item.name} className={item.className}>
+                    <p className="text-xs text-muted-foreground">{item.name}</p>
+                    <p className="mt-1 text-lg font-semibold">{formatINR(item.amount)}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="col-span-full text-sm text-muted-foreground">
+                  No expense transactions yet for this month.
+                </p>
+              )}
             </div>
           </div>
 
@@ -412,24 +531,40 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
                   </tr>
                 </thead>
                 <tbody>
-                  {TRANSACTIONS.map((row) => (
-                    <tr key={row.name} className="border-b border-border/50 last:border-none">
-                      <td className="py-3 font-medium">{row.name}</td>
+                  {recentTransactions.map((row) => (
+                    <tr key={row.id} className="border-b border-border/50 last:border-none">
+                      <td className="py-3 font-medium">{row.note || CATEGORY_LABELS[row.category]}</td>
                       <td className="py-3">
                         <span
                           className={
-                            row.status === "Completed"
+                            row.type === "INCOME"
                               ? "rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700"
                               : "rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700"
                           }
                         >
-                          {row.status}
+                          {row.type === "INCOME" ? "Income" : "Expense"}
                         </span>
                       </td>
-                      <td className="py-3 text-muted-foreground">{row.date}</td>
-                      <td className="py-3 text-right font-semibold">{row.amount}</td>
+                      <td className="py-3 text-muted-foreground">
+                        {new Date(row.date).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className={`py-3 text-right font-semibold ${row.type === "INCOME" ? "text-emerald-700" : ""}`}>
+                        {row.type === "INCOME" ? "+ " : "- "}
+                        {formatINR(row.amount)}
+                      </td>
                     </tr>
                   ))}
+                  {!financeLoading && recentTransactions.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-4 text-center text-sm text-muted-foreground">
+                        No transactions found for this month.
+                      </td>
+                    </tr>
+                  ) : null}
                 </tbody>
               </table>
             </div>
@@ -540,21 +675,21 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
               <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-3">
-              <div className="finance-soft-card p-3">
-                <p className="text-sm font-medium">Shopping</p>
-                <p className="text-xs text-muted-foreground">West Mart Complex</p>
-                <p className="mt-1 text-right text-sm font-semibold">- $1,000</p>
-              </div>
-              <div className="finance-soft-card p-3">
-                <p className="text-sm font-medium">Apple Payment</p>
-                <p className="text-xs text-muted-foreground">Payment Received</p>
-                <p className="mt-1 text-right text-sm font-semibold text-emerald-700">+ $3,000</p>
-              </div>
-              <div className="finance-soft-card p-3">
-                <p className="text-sm font-medium">Credit Card Bill</p>
-                <p className="text-xs text-muted-foreground">Monthly payment</p>
-                <p className="mt-1 text-right text-sm font-semibold">- $1,000</p>
-              </div>
+              {recentActivity.map((item) => (
+                <div key={item.id} className="finance-soft-card p-3">
+                  <p className="text-sm font-medium">{CATEGORY_LABELS[item.category]}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.note || new Date(item.date).toLocaleDateString("en-IN")}
+                  </p>
+                  <p className={`mt-1 text-right text-sm font-semibold ${item.type === "INCOME" ? "text-emerald-700" : ""}`}>
+                    {item.type === "INCOME" ? "+ " : "- "}
+                    {formatINR(item.amount)}
+                  </p>
+                </div>
+              ))}
+              {!financeLoading && recentActivity.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No recent finance activity yet.</p>
+              ) : null}
             </div>
           </div>
         </aside>

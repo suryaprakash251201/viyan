@@ -4,8 +4,8 @@ import { SectionPageShell } from "@/components/layout/section-page-shell";
 export default function BookmarksPage() {
   return (
     <SectionPageShell
-      title="Quick Links"
-      description="Your personal launchpad for fast access to frequently used sites."
+      title="Bookmarks"
+      description="Your launchpad for frequently used websites and tools."
     >
       <BookmarksManager />
     </SectionPageShell>

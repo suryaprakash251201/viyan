@@ -335,8 +335,8 @@ export function NotesManager() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 md:p-6">
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-card/70 p-4">
+    <section className="flex w-full flex-col gap-4">
+      <header className="finance-shell flex flex-wrap items-center justify-between gap-3 p-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Notes Module

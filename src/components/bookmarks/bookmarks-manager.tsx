@@ -256,8 +256,8 @@ export function BookmarksManager() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 md:p-6">
-      <header className="overflow-hidden rounded-3xl border border-border/60 bg-card/75 p-5 shadow-sm backdrop-blur-sm md:p-6">
+    <section className="flex w-full flex-col gap-5">
+      <header className="finance-shell overflow-hidden p-5 md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">

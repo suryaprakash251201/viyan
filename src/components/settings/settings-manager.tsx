@@ -132,8 +132,8 @@ export function SettingsManager() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 md:p-6">
-      <header className="rounded-xl border border-border/70 bg-card/70 p-4">
+    <section className="flex w-full max-w-5xl flex-col gap-4">
+      <header className="finance-shell p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Settings
         </p>

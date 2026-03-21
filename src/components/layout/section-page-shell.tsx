@@ -22,12 +22,12 @@ export function SectionPageShell({ title, description, children }: SectionPageSh
         />
         
         <main className="flex-1 bg-gradient-to-b from-background via-background to-muted/35 pb-10">
-          <section className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 md:p-6">
-            <header className="rounded-3xl border border-border/60 bg-card/70 p-4 backdrop-blur-sm md:p-5">
+          <section className="mx-auto flex w-full max-w-[1300px] flex-col gap-4 p-4 md:p-6">
+            <header className="finance-shell p-5 md:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Viyan
+                    OFSPACE.CO
                   </p>
                   <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
                     {title}
@@ -62,4 +62,4 @@ export function SectionPageShell({ title, description, children }: SectionPageSh
       </div>
     </div>
   );
-}
+}

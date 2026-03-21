@@ -5,7 +5,7 @@ export default function NotesPage() {
   return (
     <SectionPageShell
       title="Notes"
-      description="Capture ideas, organize them with tags, and keep them searchable."
+      description="Capture ideas, organize with tags, and find everything instantly."
     >
       <NotesManager />
     </SectionPageShell>
