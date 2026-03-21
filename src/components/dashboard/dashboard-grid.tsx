@@ -144,63 +144,54 @@ function DashboardHero({
 
   return (
     <div
-      className={`dashboard-hero relative overflow-hidden rounded-3xl border border-border/50 p-5 md:p-7 ${themePresets[preset].className}`}
+      className={`dashboard-hero relative overflow-hidden rounded-2xl border border-border/50 p-4 md:p-6 ${themePresets[preset].className}`}
     >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -left-10 -bottom-10 h-48 w-48 rounded-full bg-chart-3/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
+      <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-chart-3/10 blur-3xl" />
 
-      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              Personal Dashboard
-            </p>
+      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
+            <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-balance text-2xl font-semibold tracking-tight md:text-4xl">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight md:text-2xl">
               {greeting}
             </h1>
-            <p className="max-w-2xl text-xs text-muted-foreground md:text-base">
-              A responsive command center for your calendar, tasks, notes, finance,
-              and quick links.
+            <p className="text-sm text-muted-foreground">
+              {dateStr}
             </p>
           </div>
-          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            {dateStr}
-          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
-          <div className="hidden sm:block rounded-full border border-border/60 bg-card/70 px-3 py-2 text-xs text-muted-foreground backdrop-blur-sm">
-            Layout sync on
-          </div>
-          <button
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
             type="button"
+            variant="outline"
+            size="xs"
             onClick={onResetLayout}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-card md:px-3"
+            className="h-7 gap-1.5 rounded-full border-border/50 text-[10px] font-semibold uppercase"
           >
             <RefreshCw className="h-3 w-3" />
-            <span className="hidden xs:inline">Reset layout</span>
-            <span className="xs:hidden">Reset</span>
-          </button>
-          {Object.entries(themePresets).map(([key, { label }]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onPresetChange(key as ThemePreset)}
-              className={`rounded-full border px-2.5 py-1.5 text-xs font-medium transition md:px-3 ${
-                preset === key
-                  ? "border-primary bg-primary/20 text-primary"
-                  : "border-border/50 text-muted-foreground hover:bg-card"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+            Reset Layout
+          </Button>
+
+          <div className="flex items-center gap-1 rounded-full border border-border/40 bg-background/40 p-1 backdrop-blur-sm">
+            {Object.entries(themePresets).map(([key, { label }]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => onPresetChange(key as ThemePreset)}
+                className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase transition ${
+                  preset === key
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

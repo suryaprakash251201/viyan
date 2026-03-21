@@ -7,11 +7,11 @@ import { AppSidebar } from "./app-sidebar";
 import { useState } from "react";
 
 interface MobileSidebarProps {
-  visibleWidgets: string[];
-  onToggleWidget: (id: string) => void;
+  visibleWidgets?: string[];
+  onToggleWidget?: (id: string) => void;
 }
 
-export function MobileSidebar({ visibleWidgets, onToggleWidget }: MobileSidebarProps) {
+export function MobileSidebar({ visibleWidgets = [], onToggleWidget = () => {} }: MobileSidebarProps) {
   const [open, setOpen] = useState(false);
 
   return (

@@ -49,12 +49,12 @@ const WIDGET_MENU_ITEMS = [
 ];
 
 interface AppSidebarProps {
-  visibleWidgets: string[];
-  onToggleWidget: (id: string) => void;
+  visibleWidgets?: string[];
+  onToggleWidget?: (id: string) => void;
   isMobile?: boolean;
 }
 
-function AppSidebar({ visibleWidgets, onToggleWidget, isMobile = false }: AppSidebarProps) {
+function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile = false }: AppSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
