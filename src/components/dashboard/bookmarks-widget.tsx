@@ -13,6 +13,10 @@ interface BookmarkItem {
   category: string;
 }
 
+function isFaviconUrl(value: string | null | undefined): boolean {
+  return Boolean(value && /^https?:\/\//i.test(value));
+}
+
 export function BookmarksWidget() {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,10 +89,21 @@ export function BookmarksWidget() {
                   className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/80 px-3 py-2 text-xs transition-colors hover:bg-muted/30"
                   aria-label={`${bookmark.label} - opens in new tab`}
                 >
-                  <span className="shrink-0 text-base" aria-hidden="true">
-                    {bookmark.icon || "🔗"}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate">{bookmark.label}</span>
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border/70 bg-muted/20 text-[10px]">
+                    {isFaviconUrl(bookmark.icon) ? (
+                      <img
+                        src={bookmark.icon ?? ""}
+                        alt=""
+                        className="h-3.5 w-3.5 rounded-sm"
+                        loading="lazy"
+                      />
+                    ) : bookmark.icon ? (
+                      <span>{bookmark.icon}</span>
+                    ) : (
+                      <Bookmark className="h-3 w-3 text-muted-foreground" />
+                    )}
+                  </div>
+                  <span className="min-w-0 flex-1 truncate font-medium">{bookmark.label}</span>
                   <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
                 </a>
               </li>

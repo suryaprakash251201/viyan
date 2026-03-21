@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Bell,
   BookOpen,
   Compass,
   LayoutDashboard,
   Landmark,
+  Mail,
   Search,
   Settings,
-  Sparkles,
   User,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -45,21 +46,11 @@ function TopNav({ mobileSidebar }: TopNavProps) {
   const dark = resolvedTheme === "dark";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+      <div className="mx-auto flex h-16 max-w-[1300px] items-center justify-between gap-4 px-4 md:px-6">
         <div className="flex items-center gap-3">
           {mobileSidebar}
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2.5 group"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-md shadow-primary/25 transition-transform duration-200 group-hover:scale-105">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight">
-              Viyan
-            </span>
-          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         </div>
 
         {/* Desktop Nav Links */}
@@ -86,18 +77,35 @@ function TopNav({ mobileSidebar }: TopNavProps) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
-          {/* Search trigger */}
           <Button
             type="button"
-            variant="outline"
-            size="sm"
-            className="hidden sm:flex gap-2 text-muted-foreground h-8"
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => window.dispatchEvent(new CustomEvent("open-command-menu"))}
+            className="text-muted-foreground"
+            aria-label="Open search"
           >
-            <Search className="h-3.5 w-3.5" />
-            <span className="text-xs">Search...</span>
-            <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border/60 bg-muted/60 px-1.5 font-mono text-[10px] font-medium text-muted-foreground lg:flex">
-              <span className="text-[9px]">⌘</span>K
-            </kbd>
+            <Search className="h-4 w-4" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            aria-label="Messages"
+          >
+            <Mail className="h-4 w-4" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            aria-label="Notifications"
+          >
+            <Bell className="h-4 w-4" />
           </Button>
 
           {/* Theme toggle */}
@@ -114,7 +122,7 @@ function TopNav({ mobileSidebar }: TopNavProps) {
 
           {/* User Menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="relative h-8 w-8 rounded-full ring-2 ring-border/50 hover:ring-primary/30 transition-all bg-transparent border-none cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <DropdownMenuTrigger className="flex items-center gap-2 rounded-full border border-border/80 bg-background/60 px-2 py-1 transition-colors hover:bg-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               {session?.user?.image ? (
                 <Image
                   src={session.user.image}
@@ -124,8 +132,13 @@ function TopNav({ mobileSidebar }: TopNavProps) {
                   className="h-7 w-7 rounded-full object-cover"
                 />
               ) : (
-                <User className="h-4 w-4 text-muted-foreground" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                </div>
               )}
+              <span className="hidden text-xs font-medium text-foreground sm:block">
+                {session?.user?.name ?? "User"}
+              </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">

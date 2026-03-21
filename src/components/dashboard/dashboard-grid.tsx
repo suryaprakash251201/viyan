@@ -9,7 +9,6 @@ import {
   Bookmark,
   CalendarClock,
   CheckCircle2,
-  Clock,
   ExternalLink,
   Landmark,
   MoreHorizontal,
@@ -17,6 +16,7 @@ import {
   RefreshCw,
   Sparkles,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -110,6 +110,29 @@ const WIDGETS: WidgetMeta[] = [
   },
 ];
 
+const FINANCE_STATS = [
+  { label: "Balance", amount: "$ 32,900", growth: "3.5% this month", className: "finance-stat-a" },
+  { label: "Spending", amount: "$ 8,430", growth: "74% from budget", className: "finance-stat-b" },
+  { label: "Investment", amount: "$ 23,900", growth: "12.5% return", className: "finance-stat-c" },
+];
+
+const SPENDING_CARDS = [
+  { name: "Home Rent", amount: "$1200" },
+  { name: "Mobile Bill", amount: "$120" },
+  { name: "Electric Bill", amount: "$220" },
+  { name: "Internet", amount: "$89" },
+  { name: "Fuel", amount: "$260" },
+];
+
+const TRANSACTIONS = [
+  { name: "Royal Arkin", status: "In progress", date: "22 Jan, 2026", amount: "$12,334" },
+  { name: "Saimon Tanvir", status: "Completed", date: "28 Dec, 2025", amount: "$20,334" },
+  { name: "Washi Bin", status: "Completed", date: "12 Dec, 2025", amount: "$42,334" },
+  { name: "Zulia Andre", status: "Completed", date: "12 Dec, 2025", amount: "$42,334" },
+];
+
+const QUICK_SEND = ["AD", "DD", "WS", "SP", "RM"];
+
 function getGreeting(now: Date): string {
   const hour = now.getHours();
   if (hour < 5) return "Up late?";
@@ -119,79 +142,51 @@ function getGreeting(now: Date): string {
   return "Good night";
 }
 
-type ThemePreset = "default" | "ocean" | "forest" | "sunset";
-
-const themePresets: Record<ThemePreset, { label: string; className: string }> = {
-  default: { label: "Energize", className: "theme-energize" },
-  ocean: { label: "Ocean", className: "theme-ocean" },
-  forest: { label: "Forest", className: "theme-forest" },
-  sunset: { label: "Sunset", className: "theme-sunset" },
-};
-
 function DashboardHero({
-  preset,
   now,
-  onPresetChange,
+  userName,
   onResetLayout,
 }: {
-  preset: ThemePreset;
   now: Date | null;
-  onPresetChange: (preset: ThemePreset) => void;
+  userName: string;
   onResetLayout: () => void;
 }) {
   const greeting = now ? getGreeting(now) : "Welcome back";
   const dateStr = now ? format(now, "EEEE, MMMM d, yyyy") : "Today";
 
   return (
-    <div
-      className={`dashboard-hero relative overflow-hidden rounded-2xl border border-border/50 p-4 md:p-6 ${themePresets[preset].className}`}
-    >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-chart-3/10 blur-3xl" />
-
-      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+    <div className="finance-shell p-4 md:p-6">
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-foreground text-background">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
+              <p className="text-sm text-muted-foreground">{greeting}, {userName}. {dateStr}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight md:text-2xl">
-              {greeting}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {dateStr}
-            </p>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="outline"
-            size="xs"
             onClick={onResetLayout}
-            className="h-7 gap-1.5 rounded-full border-border/50 text-[10px] font-semibold uppercase"
+            className="h-9 gap-1.5 rounded-full border-border/70 px-4 text-xs font-semibold uppercase"
           >
             <RefreshCw className="h-3 w-3" />
             Reset Layout
           </Button>
+        </div>
 
-          <div className="flex items-center gap-1 rounded-full border border-border/40 bg-background/40 p-1 backdrop-blur-sm">
-            {Object.entries(themePresets).map(([key, { label }]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => onPresetChange(key as ThemePreset)}
-                className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase transition ${
-                  preset === key
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {FINANCE_STATS.map((card) => (
+            <div key={card.label} className={`finance-soft-card ${card.className} p-4`}>
+              <p className="text-sm text-muted-foreground">{card.label}</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight">{card.amount}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{card.growth}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -290,26 +285,14 @@ function WidgetCard({ widget, children, stats }: WidgetCardProps) {
 }
 
 export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridProps) {
+  const { data: session } = useSession();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
-  const [themePreset, setThemePreset] = useState<ThemePreset>("default");
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
     setNow(new Date());
   }, []);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("dashboard-theme-preset") as ThemePreset | null;
-    if (stored && themePresets[stored]) {
-      setThemePreset(stored);
-    }
-  }, []);
-
-  const changeThemePreset = (preset: ThemePreset) => {
-    setThemePreset(preset);
-    window.localStorage.setItem("dashboard-theme-preset", preset);
-  };
 
   const [layouts, setLayouts] = useState<DashboardLayouts>(
     Object.keys(initialLayouts).length > 0
@@ -379,83 +362,203 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
   }, [persistLayout]);
 
   return (
-    <section
-      ref={containerRef}
-      className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 md:p-6"
-    >
+    <section className="mx-auto flex w-full max-w-[1300px] flex-col gap-5 p-4 md:p-6">
       <DashboardHero
-        preset={themePreset}
         now={now}
-        onPresetChange={changeThemePreset}
+        userName={session?.user?.name ?? "there"}
         onResetLayout={resetLayout}
       />
 
-      <Responsive
-        className="layout min-w-0"
-        breakpoints={DASHBOARD_BREAKPOINTS}
-        cols={DASHBOARD_COLS}
-        layouts={layouts}
-        width={containerWidth}
-        rowHeight={20}
-        onLayoutChange={(_, allLayouts) => {
-          const nextLayouts = allLayouts as DashboardLayouts;
-          setLayouts(nextLayouts);
-          persistLayout(nextLayouts);
-        }}
-      >
-        {activeWidgetIds.map((id) => {
-          const widget = widgetById[id];
-          if (!widget) return null;
+      <div className="grid gap-5 xl:grid-cols-[1fr_300px]">
+        <div className="space-y-5">
+          <div className="finance-shell p-4 md:p-5">
+            <h3 className="text-2xl font-semibold tracking-tight">Spending</h3>
+            <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+              {SPENDING_CARDS.map((item, index) => (
+                <div
+                  key={item.name}
+                  className={
+                    index % 3 === 0
+                      ? "finance-soft-card finance-stat-a p-3"
+                      : index % 3 === 1
+                        ? "finance-soft-card finance-stat-b p-3"
+                        : "finance-soft-card finance-stat-c p-3"
+                  }
+                >
+                  <p className="text-xs text-muted-foreground">{item.name}</p>
+                  <p className="mt-1 text-lg font-semibold">{item.amount}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          const renderWidget = () => {
-            switch (id) {
-              case "calendar":
-                return <CalendarWidget />;
-              case "tasks":
-                return <TasksWidget />;
-              case "notes":
-                return <NotesWidget />;
-              case "finance":
-                return <FinanceWidget />;
-              case "bookmarks":
-                return <BookmarksWidget />;
-              default:
+          <div className="finance-shell p-4 md:p-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-semibold tracking-tight">Transactions</h3>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full border border-border/70 px-3 py-1">Newest</span>
+                <span className="rounded-full px-3 py-1">Oldest</span>
+              </div>
+            </div>
+
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[620px] text-sm">
+                <thead>
+                  <tr className="border-b border-border/70 text-left text-xs uppercase tracking-wider text-muted-foreground">
+                    <th className="pb-3 font-medium">Name</th>
+                    <th className="pb-3 font-medium">Status</th>
+                    <th className="pb-3 font-medium">Date</th>
+                    <th className="pb-3 text-right font-medium">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TRANSACTIONS.map((row) => (
+                    <tr key={row.name} className="border-b border-border/50 last:border-none">
+                      <td className="py-3 font-medium">{row.name}</td>
+                      <td className="py-3">
+                        <span
+                          className={
+                            row.status === "Completed"
+                              ? "rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700"
+                              : "rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700"
+                          }
+                        >
+                          {row.status}
+                        </span>
+                      </td>
+                      <td className="py-3 text-muted-foreground">{row.date}</td>
+                      <td className="py-3 text-right font-semibold">{row.amount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div ref={containerRef} className="finance-shell p-4 md:p-5">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <h3 className="text-2xl font-semibold tracking-tight">Workspace Widgets</h3>
+              <p className="text-xs text-muted-foreground">Drag and rearrange these modules</p>
+            </div>
+
+            <Responsive
+              className="layout min-w-0"
+              breakpoints={DASHBOARD_BREAKPOINTS}
+              cols={DASHBOARD_COLS}
+              layouts={layouts}
+              width={containerWidth}
+              rowHeight={20}
+              onLayoutChange={(_, allLayouts) => {
+                const nextLayouts = allLayouts as DashboardLayouts;
+                setLayouts(nextLayouts);
+                persistLayout(nextLayouts);
+              }}
+            >
+              {activeWidgetIds.map((id) => {
+                const widget = widgetById[id];
+                if (!widget) return null;
+
+                const renderWidget = () => {
+                  switch (id) {
+                    case "calendar":
+                      return <CalendarWidget />;
+                    case "tasks":
+                      return <TasksWidget />;
+                    case "notes":
+                      return <NotesWidget />;
+                    case "finance":
+                      return <FinanceWidget />;
+                    case "bookmarks":
+                      return <BookmarksWidget />;
+                    default:
+                      return (
+                        <div className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/80 bg-background/50 p-6 text-center">
+                          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-border/80 bg-card shadow-sm ${widget.accent}`}>
+                            <widget.icon className="h-6 w-6" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">Coming soon</p>
+                            <p className="text-xs text-muted-foreground">This module is ready for you.</p>
+                          </div>
+                          <Link
+                            href={widget.href}
+                            className={buttonVariants({
+                              variant: "outline",
+                              size: "sm",
+                              className: "gap-1.5 rounded-full",
+                            })}
+                          >
+                            Open {widget.title}
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </div>
+                      );
+                  }
+                };
+
                 return (
-                  <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/80 bg-background/50 p-6 text-center min-h-32">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-border/80 bg-card shadow-sm ${widget.accent}`}>
-                      <widget.icon className="h-6 w-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Coming soon</p>
-                      <p className="text-xs text-muted-foreground">
-                        This module is ready for you.
-                      </p>
-                    </div>
-                    <Link
-                      href={widget.href}
-                      className={buttonVariants({
-                        variant: "outline",
-                        size: "sm",
-                        className: "gap-1.5 rounded-full",
-                      })}
-                    >
-                      Open {widget.title}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                  <div key={id} className="min-w-0 pb-1">
+                    <WidgetCard widget={widget}>
+                      <ErrorBoundary>{renderWidget()}</ErrorBoundary>
+                    </WidgetCard>
                   </div>
                 );
-            }
-          };
+              })}
+            </Responsive>
+          </div>
+        </div>
 
-          return (
-            <div key={id} className="min-w-0 pb-1">
-              <WidgetCard widget={widget}>
-                <ErrorBoundary>{renderWidget()}</ErrorBoundary>
-              </WidgetCard>
+        <aside className="finance-shell h-fit p-4 md:p-5">
+          <div className="flex items-center gap-3 border-b border-border/70 pb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-semibold">
+              {session?.user?.name?.slice(0, 2).toUpperCase() ?? "AI"}
             </div>
-          );
-        })}
-      </Responsive>
+            <div>
+              <p className="font-semibold">{session?.user?.name ?? "Account"}</p>
+              <p className="text-xs text-muted-foreground">{session?.user?.email ?? "Personal dashboard"}</p>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-sm font-semibold">Send again</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {QUICK_SEND.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className="h-9 w-9 rounded-full border border-border/80 bg-background text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-border/70 pt-4">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-sm font-semibold">Recent Activity</p>
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="space-y-3">
+              <div className="finance-soft-card p-3">
+                <p className="text-sm font-medium">Shopping</p>
+                <p className="text-xs text-muted-foreground">West Mart Complex</p>
+                <p className="mt-1 text-right text-sm font-semibold">- $1,000</p>
+              </div>
+              <div className="finance-soft-card p-3">
+                <p className="text-sm font-medium">Apple Payment</p>
+                <p className="text-xs text-muted-foreground">Payment Received</p>
+                <p className="mt-1 text-right text-sm font-semibold text-emerald-700">+ $3,000</p>
+              </div>
+              <div className="finance-soft-card p-3">
+                <p className="text-sm font-medium">Credit Card Bill</p>
+                <p className="text-xs text-muted-foreground">Monthly payment</p>
+                <p className="mt-1 text-right text-sm font-semibold">- $1,000</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
   );
 }

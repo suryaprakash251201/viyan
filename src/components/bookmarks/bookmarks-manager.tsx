@@ -40,6 +40,17 @@ function BookmarkEditor({
   const [category, setCategory] = useState(bookmark.category);
   const [saving, setSaving] = useState(false);
 
+  const fetchFavicon = (targetUrl: string) => {
+    if (!targetUrl || icon) return;
+    try {
+      const hostname = new URL(targetUrl.startsWith("http") ? targetUrl : `https://${targetUrl}`).hostname;
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
+      setIcon(faviconUrl);
+    } catch {
+      // Ignore
+    }
+  };
+
   const onSave = async () => {
     setSaving(true);
     try {
@@ -70,15 +81,48 @@ function BookmarkEditor({
         <DialogHeader>
           <DialogTitle>Edit Bookmark</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-2">
-          <Input placeholder="Label" value={label} onChange={(event) => setLabel(event.target.value)} />
-          <Input placeholder="URL" value={url} onChange={(event) => setUrl(event.target.value)} />
-          <Input placeholder="Icon (emoji or text)" value={icon} onChange={(event) => setIcon(event.target.value)} />
-          <Input placeholder="Category" value={category} onChange={(event) => setCategory(event.target.value)} />
+        <div className="grid gap-4 py-2">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Label</p>
+            <Input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">URL</p>
+            <Input 
+              placeholder="URL" 
+              value={url} 
+              onChange={(e) => setUrl(e.target.value)} 
+              onBlur={() => fetchFavicon(url)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Icon</p>
+            <div className="flex gap-2">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40">
+                {isFaviconUrl(icon) ? (
+                  <img src={icon} alt="" className="h-5 w-5 rounded-sm" />
+                ) : icon ? (
+                  <span className="text-lg">{icon}</span>
+                ) : (
+                  <Bookmark className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+              <Input
+                placeholder="Emoji or Favicon URL"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Category</p>
+            <Input placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+          </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button type="button" onClick={onSave} loading={saving}>
-            Save
+            Save Changes
           </Button>
         </div>
       </DialogContent>
@@ -93,10 +137,22 @@ export function BookmarksManager() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
   const [label, setLabel] = useState("");
   const [url, setUrl] = useState("");
   const [icon, setIcon] = useState("");
   const [category, setCategory] = useState(DEFAULT_CATEGORIES[0]);
+
+  const fetchFavicon = (targetUrl: string) => {
+    if (!targetUrl || icon) return;
+    try {
+      const hostname = new URL(targetUrl.startsWith("http") ? targetUrl : `https://${targetUrl}`).hostname;
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
+      setIcon(faviconUrl);
+    } catch {
+      // Ignore invalid URLs
+    }
+  };
 
   const loadBookmarks = async () => {
     setLoading(true);
@@ -119,16 +175,24 @@ export function BookmarksManager() {
     void loadBookmarks();
   }, []);
 
+  const filteredBookmarks = useMemo(() => {
+    if (!searchTerm.trim()) return bookmarks;
+    const lower = searchTerm.toLowerCase();
+    return bookmarks.filter(
+      (b) => b.label.toLowerCase().includes(lower) || b.url.toLowerCase().includes(lower)
+    );
+  }, [bookmarks, searchTerm]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, BookmarkItem[]>();
-    for (const bookmark of bookmarks) {
+    for (const bookmark of filteredBookmarks) {
       if (!map.has(bookmark.category)) {
         map.set(bookmark.category, []);
       }
       map.get(bookmark.category)!.push(bookmark);
     }
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [bookmarks]);
+  }, [filteredBookmarks]);
 
   const editingBookmark = useMemo(
     () => bookmarks.find((bookmark) => bookmark.id === editingId) ?? null,
@@ -218,32 +282,74 @@ export function BookmarksManager() {
         </div>
       </header>
 
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Bookmark className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search bookmarks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       <Card className="border-border/60 bg-card/80 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base">Add bookmark</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Add new bookmark</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-5">
-          <Input placeholder="Label" value={label} onChange={(event) => setLabel(event.target.value)} />
-          <Input placeholder="URL" value={url} onChange={(event) => setUrl(event.target.value)} />
-          <Input
-            placeholder="Icon (emoji/text)"
-            value={icon}
-            onChange={(event) => setIcon(event.target.value)}
-          />
-          <Input
-            list="bookmark-categories"
-            placeholder="Category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          />
-          <datalist id="bookmark-categories">
-            {DEFAULT_CATEGORIES.map((entry) => (
-              <option key={entry} value={entry} />
-            ))}
-          </datalist>
-          <Button type="button" onClick={onCreate} loading={creating} className="md:col-span-5">
-            Add Bookmark
-          </Button>
+        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Label</p>
+            <Input placeholder="Personal Blog" value={label} onChange={(e) => setLabel(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">URL</p>
+            <Input 
+              placeholder="example.com" 
+              value={url} 
+              onChange={(e) => setUrl(e.target.value)}
+              onBlur={() => fetchFavicon(url)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Icon</p>
+            <div className="flex gap-2">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40">
+                {isFaviconUrl(icon) ? (
+                  <img src={icon} alt="" className="h-5 w-5 rounded-sm" />
+                ) : icon ? (
+                  <span className="text-lg">{icon}</span>
+                ) : (
+                  <Bookmark className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+              <Input
+                placeholder="Emoji or Favicon URL"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground">Category</p>
+            <div className="flex gap-2">
+              <Input
+                list="bookmark-categories"
+                placeholder="Category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
+              <Button type="button" onClick={onCreate} loading={creating} size="icon" className="shrink-0">
+                <Bookmark className="h-4 w-4" />
+              </Button>
+            </div>
+            <datalist id="bookmark-categories">
+              {DEFAULT_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat} />
+              ))}
+            </datalist>
+          </div>
         </CardContent>
       </Card>
 
