@@ -180,7 +180,7 @@ function DashboardHero({
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
+              <h2 className="text-3xl font-semibold tracking-tight md:text-[42px] md:leading-none">Dashboard</h2>
               <p className="text-sm text-muted-foreground">{greeting}, {userName}. {dateStr}</p>
             </div>
           </div>
@@ -476,7 +476,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
   }, [persistLayout]);
 
   return (
-    <section className="mx-auto flex w-full max-w-[1300px] flex-col gap-5 p-4 md:p-6">
+    <section className="mx-auto flex w-full max-w-[1300px] flex-col gap-5 px-4 pb-6 pt-5 md:px-6 md:pb-8 md:pt-7">
       <DashboardHero
         now={now}
         userName={session?.user?.name ?? "there"}
@@ -487,7 +487,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
       <div className="grid gap-5 xl:grid-cols-[1fr_300px]">
         <div className="space-y-5">
           <div className="finance-shell p-4 md:p-5">
-            <h3 className="text-2xl font-semibold tracking-tight">Spending</h3>
+            <h3 className="text-[28px] font-semibold tracking-tight leading-none">Spending</h3>
             <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
               {financeLoading ? (
                 Array.from({ length: 5 }).map((_, index) => (
@@ -513,7 +513,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
 
           <div className="finance-shell p-4 md:p-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-semibold tracking-tight">Transactions</h3>
+              <h3 className="text-[28px] font-semibold tracking-tight leading-none">Transactions</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="rounded-full border border-border/70 px-3 py-1">Newest</span>
                 <span className="rounded-full px-3 py-1">Oldest</span>
@@ -572,7 +572,7 @@ export function DashboardGrid({ initialLayouts, visibleWidgets }: DashboardGridP
 
           <div ref={containerRef} className="finance-shell p-4 md:p-5">
             <div className="mb-4 flex items-center justify-between gap-2">
-              <h3 className="text-2xl font-semibold tracking-tight">Workspace Widgets</h3>
+              <h3 className="text-[28px] font-semibold tracking-tight leading-none">Workspace Widgets</h3>
               <p className="text-xs text-muted-foreground">Drag and rearrange these modules</p>
             </div>
 

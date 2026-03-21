@@ -327,7 +327,7 @@ export function FinanceTracker() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Finance Tracker
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Income, expenses, budgets, and trends</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">Income, expenses, budgets, and trends</h1>
         </div>
         <Input
           type="month"

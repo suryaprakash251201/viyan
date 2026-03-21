@@ -208,7 +208,7 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const updateBody: any = {};
+  const updateBody: { status?: "completed" | "needsAction"; completed?: string | null; starred?: boolean } = {};
   if (typeof completed === "boolean") {
     updateBody.status = completed ? "completed" : "needsAction";
     updateBody.completed = completed ? new Date().toISOString() : null;

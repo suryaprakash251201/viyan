@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   Mail,
@@ -27,16 +28,28 @@ interface TopNavProps {
 }
 
 function TopNav({ mobileSidebar }: TopNavProps) {
+  const pathname = usePathname();
   const { data: session } = useSession();
   const { resolvedTheme, setTheme } = useTheme();
   const dark = resolvedTheme === "dark";
 
+  const pageTitle =
+    pathname.startsWith("/finance")
+      ? "Finance"
+      : pathname.startsWith("/notes")
+        ? "Notes"
+        : pathname.startsWith("/bookmarks")
+          ? "Bookmarks"
+          : pathname.startsWith("/settings")
+            ? "Settings"
+            : "Dashboard";
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <div className="mx-auto flex h-16 max-w-[1300px] items-center justify-between gap-4 px-4 md:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90">
+      <div className="mx-auto flex h-[70px] max-w-[1300px] items-center justify-between gap-4 px-5 md:px-6">
         <div className="flex items-center gap-3">
           {mobileSidebar}
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <h1 className="text-[40px] leading-none font-semibold tracking-tight md:text-[42px]">{pageTitle}</h1>
         </div>
 
         {/* Right Actions */}

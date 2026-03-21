@@ -341,7 +341,7 @@ export function NotesManager() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Notes Module
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Rich text notes, tags, and pinning</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">Rich text notes, tags, and pinning</h1>
         </div>
         <div className="flex w-full max-w-xl flex-1 items-center gap-2">
           <div className="relative w-full">

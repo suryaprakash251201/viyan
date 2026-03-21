@@ -137,7 +137,7 @@ export function SettingsManager() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Settings
         </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Preferences and account controls</h1>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">Preferences and account controls</h1>
       </header>
 
       <Card>

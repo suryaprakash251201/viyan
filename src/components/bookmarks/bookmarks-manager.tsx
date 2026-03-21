@@ -263,7 +263,7 @@ export function BookmarksManager() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Quick Links
             </p>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+            <h1 className="text-3xl font-semibold tracking-tight md:text-[38px] md:leading-none">
               Your personal launchpad
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground">

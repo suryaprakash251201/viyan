@@ -67,14 +67,14 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
       className={cn(
         "z-40 flex flex-col border-r border-sidebar-border/80 bg-sidebar transition-all duration-300",
         isMobile ? "w-full h-full" : "sticky top-0 h-screen hidden md:flex",
-        !isMobile && (collapsed ? "w-16" : "w-56")
+        !isMobile && (collapsed ? "w-16" : "w-[232px]")
       )}
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border/80 px-4">
         {!collapsed ? (
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <span className="text-lg font-extrabold tracking-tight">OFSPACE.CO</span>
+            <span className="text-[33px] leading-none font-extrabold tracking-tight">OFSPACE.CO</span>
           </Link>
         ) : (
           <Link href="/dashboard" className="mx-auto">
@@ -118,7 +118,7 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
               href={item.href}
               className={buttonVariants({
                 variant: active ? "secondary" : "ghost",
-                className: `w-full justify-start gap-2.5 h-10 text-sm rounded-xl ${
+                className: `w-full justify-start gap-3 h-11 text-[15px] rounded-xl ${
                   active
                     ? "bg-foreground text-background font-medium"
                     : "text-muted-foreground hover:bg-muted"
@@ -126,14 +126,14 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
               })}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className="h-[18px] w-[18px] shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
 
         {/* Divider */}
-        <div className="my-3 h-px bg-sidebar-border/80" />
+        <div className="my-4 h-px bg-sidebar-border/80" />
 
         {/* Widgets 3-dot menu section */}
         <div className={collapsed ? "px-1" : ""}>
@@ -164,7 +164,7 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
                     key={widget.id}
                     type="button"
                     onClick={() => onToggleWidget(widget.id)}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition-colors ${
+                    className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-sm transition-colors ${
                       isVisible
                         ? "text-foreground bg-muted"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
@@ -222,13 +222,13 @@ function AppSidebar({ visibleWidgets = [], onToggleWidget = () => {}, isMobile =
       </nav>
 
       {/* Bottom: theme + user */}
-      <div className={`border-t border-sidebar-border/80 px-2 py-3 space-y-1 ${collapsed ? "items-center" : ""}`}>
+      <div className={`mt-auto border-t border-sidebar-border/80 px-2 pb-4 pt-3 space-y-1 ${collapsed ? "items-center" : ""}`}>
         {/* Theme toggle */}
         <Button
           type="button"
           variant="ghost"
           onClick={() => setTheme(dark ? "light" : "dark")}
-          className={`w-full justify-start gap-2.5 h-9 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted ${collapsed ? "px-2 justify-center" : "px-2.5"}`}
+          className={`w-full justify-start gap-2.5 h-10 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted ${collapsed ? "px-2 justify-center" : "px-2.5"}`}
           title={collapsed ? (dark ? "Light mode" : "Dark mode") : undefined}
         >
           {dark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
